@@ -26,6 +26,7 @@ TurnLeft: turns the agent's heading to left
 Forward: the agent moves forward one step based on its current heading
 Shoot: the agent shoots an arrow (has only 1 arrow)
 Grab: grabs the gold if its on the agent's location
+Climb: to get out of the cave when gold is acquired
 ```
 
 ### Rewards
