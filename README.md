@@ -2,7 +2,7 @@
 wumpus world with gym env
 
 ## Wumpus World gym Environment
-This package implements the famous wampus world enviornment. Below you can see a sample loaded environment.
+This package implements the famous wumpus world enviornment but with multiple agents and an agent wumpsu. Below you can see a sample loaded environment.
 
 ```
 #################################
