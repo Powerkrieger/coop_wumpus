@@ -1,8 +1,12 @@
 # coop_wumpus
 wumpus world with gym env
+
 based on:
+
 https://github.com/Davood-M/gym_wumpus_world
+
 how to:
+
 https://www.novatec-gmbh.de/en/blog/creating-a-gym-environment/
 
 
