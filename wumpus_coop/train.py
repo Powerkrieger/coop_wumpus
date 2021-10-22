@@ -33,4 +33,4 @@ def main():
         f.write('end' + '\n')
 
 if __name__ == '__main__':
-main()
+    main()
