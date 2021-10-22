@@ -1,8 +1,17 @@
 # coop_wumpus
 wumpus world with gym env
 
+based on:
+
+https://github.com/Davood-M/gym_wumpus_world
+
+how to:
+
+https://www.novatec-gmbh.de/en/blog/creating-a-gym-environment/
+
+
 ## Wumpus World gym Environment
-This package implements the famous wumpus world enviornment but with multiple agents and an agent wumpsu. Below you can see a sample loaded environment.
+This package implements the famous wumpus world enviornment but with multiple agents and an agent wumpsu. Below you can see a sample loaded environment of the previous version.
 
 ```
 #################################
@@ -26,6 +35,7 @@ TurnLeft: turns the agent's heading to left
 Forward: the agent moves forward one step based on its current heading
 Shoot: the agent shoots an arrow (has only 1 arrow)
 Grab: grabs the gold if its on the agent's location
+Climb: to get out of the cave when gold is acquired
 ```
 
 ### Rewards
