@@ -17,6 +17,10 @@ pip install --upgrade gym==0.10.0
 ```
 pip install -e .
 ```
+3. execute train.py 
+```
+python train.py
+```
 
 ## Wumpus World gym Environment
 This package implements the famous wumpus world enviornment but with multiple agents and an agent wumpsu. Below you can see a sample loaded environment of the previous version.
