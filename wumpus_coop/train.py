@@ -2,10 +2,14 @@ import gym
 import wumpus_env
 import random
 import time
+import datetime
 from datetime import timedelta
 
 def main():
+    # for saving timestamp and elapsed time
+    now = datetime.datetime.now()
     start_time = time.time()
+
     env = gym.make('wumpus-v0')
 
     #random environment
@@ -26,7 +30,7 @@ def main():
     elapsed_time_secs = time.time() - start_time
     msg = "Execution took: %s secs (Wall clock time)" % timedelta(seconds=round(elapsed_time_secs))
     with open('times.txt', 'a') as f:
-        f.write(datetime.fromtimestamp(start_time))
+        f.write(str(now) + '\n')
         #for i in printargs:
         #    f.write(i + '\n')
         f.write(msg + '\n')
