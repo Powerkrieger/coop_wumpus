@@ -9,6 +9,14 @@ how to:
 
 https://www.novatec-gmbh.de/en/blog/creating-a-gym-environment/
 
+1. install gym 
+```
+pip install --upgrade gym==0.10.0
+```
+2. Install wumpus environment into pip
+```
+pip install -e .
+```
 
 ## Wumpus World gym Environment
 This package implements the famous wumpus world enviornment but with multiple agents and an agent wumpsu. Below you can see a sample loaded environment of the previous version.
