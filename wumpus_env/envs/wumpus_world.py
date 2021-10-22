@@ -3,7 +3,7 @@ import copy
 import gym
 from gym import error, spaces, utils
 from gym.utils import seeding
-import os 
+import os
 
 class WumpusWorld(gym.Env):
     metadata = {'render.modes': ['text']}
@@ -16,7 +16,7 @@ class WumpusWorld(gym.Env):
             fin = open(layout_file, 'r', encoding='utf-8')
         except:
             print('Cannot read the layout file')
-        
+
         for line in fin.readlines():
             if line.strip() == '':
                 break
@@ -24,7 +24,7 @@ class WumpusWorld(gym.Env):
             if '' in tmp:
                 tmp.remove('')
             self.board.append(tmp)
-        
+
         # check if board is valid
         for i in range(len(self.board) - 1):
             assert len(self.board[i]) == len(self.board[i+1]), 'Board is not valid!'
@@ -33,7 +33,7 @@ class WumpusWorld(gym.Env):
 
         # set initial location of the agent
         self.agent_loc = None
-        self.wumpus_loc = (-1, -1)
+        self.wumpus_loc = None
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
                 if self.board[row, col] == 'A':
@@ -45,7 +45,7 @@ class WumpusWorld(gym.Env):
         # set the default heading as north -> 0: N, 1: E, 2: S, 3: W
         self.agent_head = 0
         self.exit_loc = copy.deepcopy(self.agent_loc)
-        self.valid_actions = ['TurnRight', 'TurnLeft', 'Forward', 'Shoot', 'Climb', 'Grab']
+        self.action_space = ['TurnRight', 'TurnLeft', 'Forward', 'Shoot', 'Climb', 'Grab']
         self.agent_has_arrow = True
         self.agent_has_gold = False
 
@@ -74,12 +74,12 @@ class WumpusWorld(gym.Env):
                     glitter = True
         return [stench, breeze, glitter, bump, scream]
 
-    def step(self, action):
+    def step(self, action, update=True):
         '''
         performs the excat action (not noisy!)
         '''
-        assert action in self.valid_actions, 'Unknown action!'
-        action_ind = self.valid_actions.index(action)
+        assert action in self.action_space, 'Unknown action!'
+        action_ind = self.action_space.index(action)
         gameover = False
         scream = False
         bump = False
@@ -111,8 +111,8 @@ class WumpusWorld(gym.Env):
             elif self.agent_head == 3 and self.agent_loc[1] > 0:
                 self.board[self.agent_loc] = '.' if self.board[self.agent_loc] == 'A' else self.board[self.agent_loc].replace('A&', '')
                 self.agent_loc = (self.agent_loc[0], self.agent_loc[1] - 1)
-            
-            # set the agent on board! 
+
+            # set the agent on board!
             if pas_loc != self.agent_loc and self.board[self.agent_loc] == '.':
                 self.board[self.agent_loc] = 'A'
                 reward = -1
@@ -174,12 +174,12 @@ class WumpusWorld(gym.Env):
                 self.board[self.agent_loc] = 'A'
                 self.agent_has_gold = True
             reward = -1
-        
-        # return reward, state, is_done
+
+        # return state, reward, done, info
         return self._get_current_state(scream, bump), reward, gameover, {}
 
-    def get_valid_actions(self):
-        return self.valid_actions
+    def get_action_space(self):
+        return self.action_space
 
     def render(self, mode='text'):
         print(self.print_env())
@@ -189,7 +189,7 @@ class WumpusWorld(gym.Env):
         return self._get_current_state(False, False)
 
     def close(self):
-        return 
+        return
 
     def print_env(self):
         printer = ''.join(['########' for i in range(len(self.board[0]))]) + '#\n'

@@ -2,9 +2,7 @@ from setuptools import setup
 
 setup(
     name = 'coop_wumpus',
-    packages = ['coop_wumpus'],
     version = '0.1',
-    license = 'MIT',
     install_requires = ['gym', 'numpy'],
     description = 'Coop Wumpus World environment for gym',
     author = 'die elitären 31er',
