@@ -8,31 +8,14 @@ import os
 class WumpusWorld(gym.Env):
     metadata = {'render.modes': ['text']}
 
-    def __init__(self, layout_file=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'layouts', 'wumpus_4x4_book.lay')):
-        # read the board file and construct the layout
-        self.board = []
+    def __init__(self):
 
-        try:
-            fin = open(layout_file, 'r', encoding='utf-8')
-        except:
-            print('Cannot read the layout file')
-
-        for line in fin.readlines():
-            if line.strip() == '':
-                break
-            tmp = line.strip().split(',')
-            if '' in tmp:
-                tmp.remove('')
-            self.board.append(tmp)
-
-        # check if board is valid
-        for i in range(len(self.board) - 1):
-            assert len(self.board[i]) == len(self.board[i+1]), 'Board is not valid!'
-
+        self.agents = []
+        self.board = self.create_new_playing_field()
         self.board = np.array(self.board, dtype=object)
 
         # set initial location of the agent
-        self.agent_loc = None
+        self.agent.loc = None
         self.wumpus_loc = None
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
@@ -49,30 +32,35 @@ class WumpusWorld(gym.Env):
         self.agent_has_arrow = True
         self.agent_has_gold = False
 
-    def _get_current_state(self, scream, bump):
-        # agent_location and current position things!
-        # [stench, breeze, glitter, bump, scream]
-        stench = False
-        breeze = False
-        glitter = False
+    def create_new_playing_field(self):
+        #change this to be able to randomize the playing field
+        board = []
+        layout_file=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'layouts', 'wumpus_4x4_book.lay')
+        # read the board file and construct the layout
 
-        agent_fours = [
-            (self.agent_loc[0] - 1, self.agent_loc[1]) if self.agent_loc[0] - 1 >= 0 else None,
-            (self.agent_loc[0] + 1, self.agent_loc[1]) if self.agent_loc[0] + 1 < len(self.board) else None,
-            (self.agent_loc[0], self.agent_loc[1] - 1) if self.agent_loc[1] - 1 >= 0 else None,
-            (self.agent_loc[0], self.agent_loc[1] + 1) if self.agent_loc[1] + 1 < len(self.board[0]) else None,
-            (self.agent_loc[0], self.agent_loc[1])
-        ]
+        try:
+            fin = open(layout_file, 'r', encoding='utf-8')
+        except:
+            print('Cannot read the layout file')
 
-        for loc in agent_fours:
-            if loc != None:
-                if 'P' in self.board[loc]:
-                    breeze = True
-                elif 'W' in self.board[loc]:
-                    stench = True
-                elif 'G' in self.board[loc]:
-                    glitter = True
-        return [stench, breeze, glitter, bump, scream]
+        for line in fin.readlines():
+            if line.strip() == '':
+                break
+            tmp = line.strip().split(',')
+            if '' in tmp:
+                tmp.remove('')
+            board.append(tmp)
+
+        # check if board is valid
+        # this is not a valid test, since it only checks for being rechteckig but that doesnt even have to be a criterion
+        for i in range(len(board) - 1):
+            assert len(board[i]) == len(board[i+1]), 'Board is not valid!'
+
+        return board
+
+    def reset(self):
+        self.__init__()
+        return self._get_current_state(False, False)
 
     def step(self, action, update=True):
         '''
@@ -178,18 +166,36 @@ class WumpusWorld(gym.Env):
         # return state, reward, done, info
         return self._get_current_state(scream, bump), reward, gameover, {}
 
+    def _get_current_state(self, scream, bump):
+        # agent_location and current position things!
+        # [stench, breeze, glitter, bump, scream]
+        stench = False
+        breeze = False
+        glitter = False
+
+        agent_fours = [
+            (self.agent_loc[0] - 1, self.agent_loc[1]) if self.agent_loc[0] - 1 >= 0 else None,
+            (self.agent_loc[0] + 1, self.agent_loc[1]) if self.agent_loc[0] + 1 < len(self.board) else None,
+            (self.agent_loc[0], self.agent_loc[1] - 1) if self.agent_loc[1] - 1 >= 0 else None,
+            (self.agent_loc[0], self.agent_loc[1] + 1) if self.agent_loc[1] + 1 < len(self.board[0]) else None,
+            (self.agent_loc[0], self.agent_loc[1])
+        ]
+
+        for loc in agent_fours:
+            if loc != None:
+                if 'P' in self.board[loc]:
+                    breeze = True
+                elif 'W' in self.board[loc]:
+                    stench = True
+                elif 'G' in self.board[loc]:
+                    glitter = True
+        return [stench, breeze, glitter, bump, scream]
+
     def get_action_space(self):
         return self.action_space
 
     def render(self, mode='text'):
         print(self.print_env())
-
-    def reset(self):
-        self.__init__()
-        return self._get_current_state(False, False)
-
-    def close(self):
-        return
 
     def print_env(self):
         printer = ''.join(['########' for i in range(len(self.board[0]))]) + '#\n'
@@ -221,3 +227,6 @@ class WumpusWorld(gym.Env):
                 printer += '#' + ''.join(['--------' for i in range(len(self.board[0]))])[:-1] + '#\n'
         printer += ''.join(['########' for i in range(len(self.board[0]))]) + '#\n'
         return printer
+
+    def close(self):
+        return
