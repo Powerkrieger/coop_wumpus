@@ -1,5 +1,10 @@
 # coop_wumpus
 wumpus world with gym env
+based on:
+https://github.com/Davood-M/gym_wumpus_world
+how to:
+https://www.novatec-gmbh.de/en/blog/creating-a-gym-environment/
+
 
 ## Wumpus World gym Environment
 This package implements the famous wumpus world enviornment but with multiple agents and an agent wumpsu. Below you can see a sample loaded environment of the previous version.
