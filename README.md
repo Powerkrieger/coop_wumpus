@@ -9,7 +9,11 @@ how to:
 
 https://www.novatec-gmbh.de/en/blog/creating-a-gym-environment/
 
-1. Install wumpus environment into pip
+1. install gym 
+```
+pip install --upgrade gym==0.10.0
+```
+2. Install wumpus environment into pip
 ```
 pip install -e .
 ```
