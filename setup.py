@@ -1,5 +1,7 @@
 from setuptools import setup
 
+# this is for the usage as a gym environment
+
 setup(
     name = 'coop_wumpus',
     version = '0.1',
@@ -18,6 +20,7 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
 
 )
