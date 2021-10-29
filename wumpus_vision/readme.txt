@@ -12,7 +12,7 @@ Die Vektoren sind eine wie folgt strukturierte Liste (Zeilentrennung nur zur Üb
 
 BoardGrößeX, BoardGrößeY, 
 AgentPosX, AgentPosY, AngentBlickrichtung (0=UP, 1=RIGHT, 2=DOWN, 3 = LEFT),
-WumpusX,WumpusYyWumpusStatus (1=Alive, 0=Dead),
+WumpusX,WumpusY, WumpusStatus (1=Alive, 0=Dead),
 GoldX, GoldY, AHasGold (0=No, 1=Yes),
 NumberOfPits, P1_X, P1_Y, ..., Pn_X,Pn_Y
 
