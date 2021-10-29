@@ -15,7 +15,7 @@ class WumpusWorld(gym.Env):
         self.board = np.array(self.board, dtype=object)
 
         # set initial location of the agent
-        self.agent.loc = None
+        self.agent_loc = None
         self.wumpus_loc = None
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
