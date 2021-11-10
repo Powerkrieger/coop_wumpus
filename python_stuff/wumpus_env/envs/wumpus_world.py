@@ -195,23 +195,6 @@ class WumpusWorld(gym.Env):
         return self.action_space
 
     def render(self, mode='text'):
-<<<<<<< HEAD
-=======
-        logvector = []
-        logvector.append(self.board.shape[0])
-        logvector.append(self.board.shape[1])
-        logvector.append(self.agent_loc[0])
-        logvector.append(self.agent_loc[1])
-        logvector.append(self.agent_head)
-        logvector.append(self.wumpus_loc[0])
-        logvector.append(self.wumpus_loc[1])
-        logvector.append(1)
-        
-
-
-
-
->>>>>>> 8ed38f5206dbc31cc4b7aa1af6052928a682fc81
         print(self.print_env())
 
     def print_env(self):
