@@ -5,7 +5,7 @@ partially observable, strategic, sequential, static, discrete multiagent wumpus 
 
 
 # how to install
-==TODO==
+== TODO ==
 ```java
 someting.func()
 ```
