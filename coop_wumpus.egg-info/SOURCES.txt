@@ -1,7 +1,0 @@
-README.md
-setup.py
-coop_wumpus.egg-info/PKG-INFO
-coop_wumpus.egg-info/SOURCES.txt
-coop_wumpus.egg-info/dependency_links.txt
-coop_wumpus.egg-info/requires.txt
-coop_wumpus.egg-info/top_level.txt
