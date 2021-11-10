@@ -28,7 +28,7 @@ someting.func()
 + Rectangle: minimal size: |players|+2 for hight or width, the other side being at least |players| 
 + all gold has to be reachable
 
-#### number of ...
+###### number of ...
 + ...pits: |players| + 1
 + ...gold: |wumpi|
 + ...wumpi: |gold|
