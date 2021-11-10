@@ -1,0 +1,21 @@
+Metadata-Version: 2.1
+Name: coop-wumpus
+Version: 0.1
+Summary: Coop Wumpus World environment for gym
+Home-page: https://github.com/Powerkrieger/coop_wumpus
+Author: die elitären 31er
+License: UNKNOWN
+Keywords: wumpus world,wumpus,gym,coop
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Build Tools
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+
+UNKNOWN
+
