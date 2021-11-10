@@ -1,0 +1,6 @@
+Number n of board vectors <int>
+Length l of vectors <int>
+Board vector 1 <int_1,int_2,...,int_l>
+Board vector 2 <int_1,int_2,...,int_l>
+...
+Board vector n <int_1,int_2,...,int_l>
