@@ -13,24 +13,24 @@ someting.func()
 -
 
 # World description
-Wumpus environment is rectangular
-Agents: one or more wumpi, two Player
-possible observations: nothing, gold, pit, breeze, stench, exit (mby light), locationvector for scream
++ Wumpus environment is rectangular
++ Agents: one or more wumpi, two Player
++ possible observations: nothing, gold, pit, breeze, stench, exit (mby light), locationvector for scream
 
-gold: contains one gold
-pit: kills agent
-breeze: in von Neumnann neighborhood to pit
-stench: in von Neumnann neighborhood to wumpus
-goal: collecting gold + (asap?)
-vector: pointing from one agents position to the scream location
++ gold: contains one gold
++ pit: kills agent
++ breeze: in von Neumnann neighborhood to pit
++ stench: in von Neumnann neighborhood to wumpus
++ goal: collecting gold + (asap?)
++ vector: pointing from one agents position to the scream location
 
-Rectangle: minimal size: |players|+2 for hight or width, the other side being at least |players| 
-all gold has to be reachable
++ Rectangle: minimal size: |players|+2 for hight or width, the other side being at least |players| 
++ all gold has to be reachable
 
-number of ...
-...pits: |players| + 1
-...gold: |wumpi|
-...wumpi: |gold|
++ number of ...
++ ...pits: |players| + 1
++ ...gold: |wumpi|
++ ...wumpi: |gold|
 
 
 # Actions
