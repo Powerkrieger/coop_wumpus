@@ -13,17 +13,19 @@ someting.func()
 -
 
 # World description
+
 ### env
 + wumpus environment is rectangular
 + Agents: one or more wumpi, two Player
 + possible observations: nothing, gold, pit, breeze, stench, exit (mby light), locationvector for scream
+
 ### states
 + gold: contains one gold
 + pit: kills agent
 + breeze: in von Neumnann neighborhood to pit
 + stench: in von Neumnann neighborhood to wumpus
-+ goal: collecting gold + (asap?)
 + vector: pointing from one agents position to the scream location
+
 ### requirements
 + Rectangle: minimal size: |players|+2 for hight or width, the other side being at least |players| 
 + all gold has to be reachable
@@ -35,6 +37,7 @@ someting.func()
 
 
 # Actions
+
 ### Perception of the Player
 Perception of a player is limited to the cell she is standing on (partially-observable)
 This means the state of only this one cell is fixed but she is meant to remember the states of cells she has been to since they dont change a lot.
@@ -56,4 +59,4 @@ This means the state of only this one cell is fixed but she is meant to remember
   - do nothing for one turn
 
 ### goal
-pick up a piece of gold and leave
+pick up a piece of gold and leave (asap?)
