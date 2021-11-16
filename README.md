@@ -43,10 +43,14 @@ Perception of a player is limited to the cell she is standing on (partially-obse
 This means the state of only this one cell is fixed but she is meant to remember the states of cells she has been to since they dont change a lot.
 
 ### actions of the player
-- walking
+- walk_up
   - the player can walk one cell every move
-- turn
-  - the player can change the direction she is facing
+- walk_down
+  - the player can walk one cell every move
+- walk_left
+  - the player can walk one cell every move
+- walk_right
+  - the player can walk one cell every move
 - pick up
   - the player can pick up gold if she is on a gold cell
 - put down
