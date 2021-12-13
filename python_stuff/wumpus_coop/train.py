@@ -49,7 +49,7 @@ def main():
                     confignum = confignum + np.power(2, x)
 
             rand = random.randint(0, 100)
-            if rand < 50 or not episode > 900:
+            if rand < 30 or not episode > 900:
                 action = random.choice(env.action_space)
             else:
                 actnr = 0
@@ -71,7 +71,7 @@ def main():
 
             fullreward += reward
 
-            if rand < 50 or not episode > 900:
+            if rand < 30 or not episode > 900:
                 qTable[confignum][actions.index(action)] = (qTable[confignum][actions.index(action)] + reward) / 2
             else:
                 qTable[confignum][actnr] = (qTable[confignum][actnr] + reward) / 2
@@ -79,7 +79,7 @@ def main():
         print('Episode:{} Score:{}'.format(episode, score))
         allscore += score
 
-        '''for a in range(len(agentconfigs)):
+        for a in range(len(agentconfigs)):
 
             confignum = 0
             for x in range(len(agentconfigs[a])):
@@ -87,7 +87,7 @@ def main():
                     confignum = confignum + np.power(2, x)
 
             laction = agentactions[a]
-            qTable[confignum][actions.index(laction)] = (qTable[confignum][actions.index(laction)] + fullreward) / 2'''
+            qTable[confignum][actions.index(laction)] = (qTable[confignum][actions.index(laction)] + fullreward/10 ) / 2
 
     print(qTable)
     print(allscore)
