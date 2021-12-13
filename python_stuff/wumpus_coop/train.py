@@ -23,6 +23,8 @@ def main():
         for y in range(len(qTable[x])):
             qTable[x][y] = 0
 
+    allscore = 0
+
     # random environment
     episodes = 1000
     for episode in range(1, episodes+1):
@@ -34,6 +36,10 @@ def main():
         action = 'Nothing'
         n_state, reward, done, info = env.step(action)
 
+        agentactions = []
+        agentconfigs = []
+        fullreward = 0
+
         while not done:
             env.render()
 
@@ -43,7 +49,7 @@ def main():
                     confignum = confignum + np.power(2, x)
 
             rand = random.randint(0, 100)
-            if rand < 20 or not episode > 900:
+            if rand < 50 or not episode > 900:
                 action = random.choice(env.action_space)
             else:
                 actnr = 0
@@ -55,18 +61,36 @@ def main():
 
                 action = actions[actnr]
 
+            agentconfigs.append([n_state])
+            agentactions.append(action)
+
             print(action)
 
             n_state, reward, done, info = env.step(action)
             score += reward
 
-            if rand < 20 or not episode > 900:
+            fullreward += reward
+
+            if rand < 50 or not episode > 900:
                 qTable[confignum][actions.index(action)] = (qTable[confignum][actions.index(action)] + reward) / 2
             else:
                 qTable[confignum][actnr] = (qTable[confignum][actnr] + reward) / 2
 
         print('Episode:{} Score:{}'.format(episode, score))
+        allscore += score
+
+        '''for a in range(len(agentconfigs)):
+
+            confignum = 0
+            for x in range(len(agentconfigs[a])):
+                if agentconfigs[a][x]:
+                    confignum = confignum + np.power(2, x)
+
+            laction = agentactions[a]
+            qTable[confignum][actions.index(laction)] = (qTable[confignum][actions.index(laction)] + fullreward) / 2'''
+
     print(qTable)
+    print(allscore)
 
     elapsed_time_secs = time.time() - start_time
     msg = "Execution took: %s secs (Wall clock time)" % timedelta(seconds=round(elapsed_time_secs))

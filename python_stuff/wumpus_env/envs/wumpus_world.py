@@ -123,8 +123,8 @@ class WumpusWorld(gym.Env):
                 reward = 1000
                 gameover = True
             elif self.agent_loc == self.exit_loc:
+                reward = -1000
                 gameover = True
-                reward = -1
             else:
                 reward = -1
                 bump = True
