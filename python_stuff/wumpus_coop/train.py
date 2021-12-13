@@ -4,6 +4,7 @@ import random
 import time
 import datetime
 from datetime import timedelta
+import numpy as np
 
 def main():
     # for saving timestamp and elapsed time
@@ -19,11 +20,19 @@ def main():
         done = False
         score = 0
 
+
         while not done:
+
             env.render()
             action = random.choice(env.action_space)
             print(action)
             n_state, reward, done, info = env.step(action)
+
+            confignum = 0
+            for x in range(len(n_state)):
+                if n_state[x]:
+                    confignum = confignum + np.power(2, x)
+
             score += reward
         print('Episode:{} Score:{}'.format(episode, score))
 
