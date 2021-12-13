@@ -28,7 +28,7 @@ class WumpusWorld(gym.Env):
         # set the default heading as north -> 0: N, 1: E, 2: S, 3: W
         self.agent_head = 0
         self.exit_loc = copy.deepcopy(self.agent_loc)
-        self.action_space = ['TurnRight', 'TurnLeft', 'Forward', 'Shoot', 'Climb', 'Grab']
+        self.action_space = ['MoveUp','MoveDown','MoveLeft','MoveRight', 'PickUp', 'PutDown', 'Climb', 'Scream', 'Nothing']
         self.agent_has_arrow = True
         self.agent_has_gold = False
 
@@ -72,79 +72,52 @@ class WumpusWorld(gym.Env):
         scream = False
         bump = False
 
+        pas_loc = copy.deepcopy(self.agent_loc)
         if action_ind == 0:
-            # turn right
-            self.agent_head = (self.agent_head + 1) % 4
-            reward = -1
-        elif action_ind == 1:
-            # turn left
-            self.agent_head = (self.agent_head - 1) % 4
-            reward = -1
-
-        elif action_ind == 2:
-            # forward
-            pas_loc = copy.deepcopy(self.agent_loc)
+            #north
             if self.agent_head == 0 and self.agent_loc[0] > 0:
                 self.board[self.agent_loc] = '.' if self.board[self.agent_loc] == 'A' else self.board[self.agent_loc].replace('A&', '')
                 self.agent_loc = (self.agent_loc[0] - 1, self.agent_loc[1])
+            self.agent_head = 0
+            reward = -1
 
-            elif self.agent_head == 1 and self.agent_loc[1] < len(self.board[0]) - 1:
-                self.board[self.agent_loc] = '.' if self.board[self.agent_loc] == 'A' else self.board[self.agent_loc].replace('A&', '')
-                self.agent_loc = (self.agent_loc[0], self.agent_loc[1] + 1)
-
-            elif self.agent_head == 2 and self.agent_loc[0] < len(self.board) - 1:
+        elif action_ind == 1:
+            #south
+            if self.agent_head == 2 and self.agent_loc[0] < len(self.board) - 1:
                 self.board[self.agent_loc] = '.' if self.board[self.agent_loc] == 'A' else self.board[self.agent_loc].replace('A&', '')
                 self.agent_loc = (self.agent_loc[0] + 1, self.agent_loc[1])
+            self.agent_head = 2
+            reward = -1
 
-            elif self.agent_head == 3 and self.agent_loc[1] > 0:
+        elif action_ind == 2:
+            #west
+            if self.agent_head == 3 and self.agent_loc[1] > 0:
                 self.board[self.agent_loc] = '.' if self.board[self.agent_loc] == 'A' else self.board[self.agent_loc].replace('A&', '')
                 self.agent_loc = (self.agent_loc[0], self.agent_loc[1] - 1)
-
-            # set the agent on board!
-            if pas_loc != self.agent_loc and self.board[self.agent_loc] == '.':
-                self.board[self.agent_loc] = 'A'
-                reward = -1
-            elif pas_loc != self.agent_loc and self.board[self.agent_loc] == 'W':
-                self.board[self.agent_loc] = 'A&W'
-                reward = -1000
-                gameover = True
-            elif pas_loc != self.agent_loc and self.board[self.agent_loc] == 'P':
-                self.board[self.agent_loc] = 'A&P'
-                reward = -1000
-                gameover = True
-            elif pas_loc != self.agent_loc and self.board[self.agent_loc] == 'G':
-                self.board[self.agent_loc] = 'A&G'
-                reward = -1
-            elif pas_loc != self.agent_loc and self.board[self.agent_loc] == 'X':
-                self.board[self.agent_loc] = 'A&X'
-                reward = -1
-            elif pas_loc == self.agent_loc:
-                bump = True
-                reward = -1
+            self.agent_head = 3
+            reward = -1
 
         elif action_ind == 3:
-            # shoot in the direction of the agent's heading
-            if self.agent_has_arrow:
-                if self.agent_head == 0 and self.wumpus_loc[1] == self.agent_loc[1] and self.wumpus_loc[0] < self.agent_loc[0]:
-                    self.agent_has_arrow = False
-                    self.board[self.wumpus_loc] = 'X'
-                    scream = True
-                elif self.agent_head == 1 and self.wumpus_loc[0] == self.agent_loc[0] and self.wumpus_loc[1] > self.agent_loc[1]:
-                    self.agent_has_arrow = False
-                    self.board[self.wumpus_loc] = 'X'
-                    scream = True
-                elif self.agent_head == 2 and self.wumpus_loc[1] == self.agent_loc[1] and self.wumpus_loc[0] > self.agent_loc[0]:
-                    self.agent_has_arrow = False
-                    self.board[self.wumpus_loc] = 'X'
-                    scream = True
-                elif self.agent_head == 3 and self.wumpus_loc[0] == self.agent_loc[0] and self.wumpus_loc[1] < self.agent_loc[1]:
-                    self.agent_has_arrow = False
-                    self.board[self.wumpus_loc] = 'X'
-                    scream = True
-
-            reward = -10
+            #east
+            if self.agent_head == 1 and self.agent_loc[1] < len(self.board[0]) - 1:
+                self.board[self.agent_loc] = '.' if self.board[self.agent_loc] == 'A' else self.board[self.agent_loc].replace('A&', '')
+                self.agent_loc = (self.agent_loc[0], self.agent_loc[1] + 1)
+            self.agent_head = 1
+            reward = -1
 
         elif action_ind == 4:
+            #pick up
+            if self.board[self.agent_loc] == 'A&G':
+                self.board[self.agent_loc] = 'A'
+                self.agent_has_gold = True
+            reward = -1
+        elif action_ind == 5:
+            #put down
+            if agent_has_gold and self.board[self.agent_loc] == 'A':
+                self.board[self.agent_loc] = 'A&G'
+                self.agent_has_gold = False
+            reward = -1
+        elif action_ind == 6:
             # climb
             if self.agent_loc == self.exit_loc and self.agent_has_gold:
                 reward = 1000
@@ -156,12 +129,58 @@ class WumpusWorld(gym.Env):
                 reward = -1
                 bump = True
 
-        elif action_ind == 5:
-            # grab
-            if self.board[self.agent_loc] == 'A&G':
-                self.board[self.agent_loc] = 'A'
-                self.agent_has_gold = True
+        elif action_ind == 7:
+            # scream
+            scream = True
             reward = -1
+        elif action_ind == 8:
+            #Nothing
+            reward = -1
+
+        # set the agent on board!
+        if pas_loc != self.agent_loc and self.board[self.agent_loc] == '.':
+            self.board[self.agent_loc] = 'A'
+        elif pas_loc != self.agent_loc and self.board[self.agent_loc] == 'W':
+            self.board[self.agent_loc] = 'A&W'
+            reward = -1000
+            gameover = True
+        elif pas_loc != self.agent_loc and self.board[self.agent_loc] == 'P':
+            self.board[self.agent_loc] = 'A&P'
+            reward = -1000
+            gameover = True
+        elif pas_loc != self.agent_loc and self.board[self.agent_loc] == 'G':
+            self.board[self.agent_loc] = 'A&G'
+        elif pas_loc != self.agent_loc and self.board[self.agent_loc] == 'X':
+            self.board[self.agent_loc] = 'A&X'
+        elif pas_loc == self.agent_loc:
+            bump = True
+            reward = -1
+
+
+    """
+    elif action_ind == 4:
+        # shoot in the direction of the agent's heading
+        if self.agent_has_arrow:
+            if self.agent_head == 0 and self.wumpus_loc[1] == self.agent_loc[1] and self.wumpus_loc[0] < self.agent_loc[0]:
+                self.agent_has_arrow = False
+                self.board[self.wumpus_loc] = 'X'
+                scream = True
+            elif self.agent_head == 1 and self.wumpus_loc[0] == self.agent_loc[0] and self.wumpus_loc[1] > self.agent_loc[1]:
+                self.agent_has_arrow = False
+                self.board[self.wumpus_loc] = 'X'
+                scream = True
+            elif self.agent_head == 2 and self.wumpus_loc[1] == self.agent_loc[1] and self.wumpus_loc[0] > self.agent_loc[0]:
+                self.agent_has_arrow = False
+                self.board[self.wumpus_loc] = 'X'
+                scream = True
+            elif self.agent_head == 3 and self.wumpus_loc[0] == self.agent_loc[0] and self.wumpus_loc[1] < self.agent_loc[1]:
+                self.agent_has_arrow = False
+                self.board[self.wumpus_loc] = 'X'
+                scream = True
+
+        reward = -10
+        """
+
 
         # return state, reward, done, info
         return self._get_current_state(scream, bump), reward, gameover, {}
