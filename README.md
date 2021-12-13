@@ -2,15 +2,31 @@
 Our new approach aims to allow multiple agent approaches to work together on a wumpus environment.
 An executable file in java - which can be fed with the locations of the files for two agents - will simulate one walkthrough in our
 partially observable, strategic, sequential, static, discrete multiagent wumpus world.
+wumpus world with gym env
+
+based on:
+
+https://github.com/Davood-M/gym_wumpus_world
+
+how to:
+
+https://www.novatec-gmbh.de/en/blog/creating-a-gym-environment/
 
 
 # how to install
-== TODO ==
-```java
-someting.func()
+
+1. install gym 
 ```
--
--
+pip install --upgrade gym==0.10.0
+```
+2. Install wumpus environment into pip
+```
+pip install -e .
+```
+3. execute train.py 
+```
+python train.py
+```
 
 # World description
 
