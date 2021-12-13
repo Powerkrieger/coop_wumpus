@@ -64,6 +64,7 @@ def main():
                 qTable[confignum][actions.index(action)] = reward
             else:
                 qTable[confignum][actnr] = reward
+
         print('Episode:{} Score:{}'.format(episode, score))
 
     elapsed_time_secs = time.time() - start_time
