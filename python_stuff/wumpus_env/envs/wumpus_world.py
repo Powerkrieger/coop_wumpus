@@ -113,7 +113,7 @@ class WumpusWorld(gym.Env):
             reward = -1
         elif action_ind == 5:
             #put down
-            if agent_has_gold and self.board[self.agent_loc] == 'A':
+            if self.agent_has_gold and self.board[self.agent_loc] == 'A':
                 self.board[self.agent_loc] = 'A&G'
                 self.agent_has_gold = False
             reward = -1
