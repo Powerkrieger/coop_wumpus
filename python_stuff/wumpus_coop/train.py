@@ -24,7 +24,7 @@ def main():
             qTable[x][y] = 0
 
     # random environment
-    episodes = 100
+    episodes = 1000
     for episode in range(1, episodes+1):
         state = env.reset()
         done = False
@@ -43,7 +43,7 @@ def main():
                     confignum = confignum + np.power(2, x)
 
             rand = random.randint(0, 100)
-            if rand < 100 - int(episode/10):
+            if rand < 20 or not episode > 900:
                 action = random.choice(env.action_space)
             else:
                 actnr = 0
@@ -60,12 +60,13 @@ def main():
             n_state, reward, done, info = env.step(action)
             score += reward
 
-            if rand < 100 - int(episode/10):
-                qTable[confignum][actions.index(action)] = reward
+            if rand < 20 or not episode > 900:
+                qTable[confignum][actions.index(action)] = (qTable[confignum][actions.index(action)] + reward) / 2
             else:
-                qTable[confignum][actnr] = reward
+                qTable[confignum][actnr] = (qTable[confignum][actnr] + reward) / 2
 
         print('Episode:{} Score:{}'.format(episode, score))
+    print(qTable)
 
     elapsed_time_secs = time.time() - start_time
     msg = "Execution took: %s secs (Wall clock time)" % timedelta(seconds=round(elapsed_time_secs))
