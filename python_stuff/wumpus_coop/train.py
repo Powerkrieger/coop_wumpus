@@ -14,24 +14,24 @@ def main():
     env = gym.make('wumpus-v0')
 
     # Init QTable
-    qTable = [] * 32
+    qTable = [[]] * 32
 
     for x in range(len(qTable)):
-        qTable[x] = np.array([np.arange(9)])
+        qTable[x] = np.array(np.arange(9))
 
     for x in range(len(qTable)):
-        for y in range(qTable[x]):
+        for y in range(len(qTable[x])):
             qTable[x][y] = 0
 
     # random environment
-    episodes = 10
+    episodes = 100
     for episode in range(1, episodes+1):
         state = env.reset()
         done = False
         score = 0
 
         actions = env.action_space
-        action = 'nothing'
+        action = 'Nothing'
         n_state, reward, done, info = env.step(action)
 
         while not done:
@@ -43,7 +43,7 @@ def main():
                     confignum = confignum + np.power(2, x)
 
             rand = random.randint(0, 100)
-            if rand < 20:
+            if rand < 100 - int(episode/10):
                 action = random.choice(env.action_space)
             else:
                 actnr = 0
@@ -60,7 +60,7 @@ def main():
             n_state, reward, done, info = env.step(action)
             score += reward
 
-            if rand < 20:
+            if rand < 100 - int(episode/10):
                 qTable[confignum][actions.index(action)] = reward
             else:
                 qTable[confignum][actnr] = reward

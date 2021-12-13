@@ -113,7 +113,7 @@ class WumpusWorld(gym.Env):
             reward = -1
         elif action_ind == 5:
             #put down
-            if agent_has_gold and self.board[self.agent_loc] == 'A':
+            if self.agent_has_gold and self.board[self.agent_loc] == 'A':
                 self.board[self.agent_loc] = 'A&G'
                 self.agent_has_gold = False
             reward = -1
@@ -155,32 +155,6 @@ class WumpusWorld(gym.Env):
         elif pas_loc == self.agent_loc:
             bump = True
             reward = -1
-
-
-    """
-    elif action_ind == 4:
-        # shoot in the direction of the agent's heading
-        if self.agent_has_arrow:
-            if self.agent_head == 0 and self.wumpus_loc[1] == self.agent_loc[1] and self.wumpus_loc[0] < self.agent_loc[0]:
-                self.agent_has_arrow = False
-                self.board[self.wumpus_loc] = 'X'
-                scream = True
-            elif self.agent_head == 1 and self.wumpus_loc[0] == self.agent_loc[0] and self.wumpus_loc[1] > self.agent_loc[1]:
-                self.agent_has_arrow = False
-                self.board[self.wumpus_loc] = 'X'
-                scream = True
-            elif self.agent_head == 2 and self.wumpus_loc[1] == self.agent_loc[1] and self.wumpus_loc[0] > self.agent_loc[0]:
-                self.agent_has_arrow = False
-                self.board[self.wumpus_loc] = 'X'
-                scream = True
-            elif self.agent_head == 3 and self.wumpus_loc[0] == self.agent_loc[0] and self.wumpus_loc[1] < self.agent_loc[1]:
-                self.agent_has_arrow = False
-                self.board[self.wumpus_loc] = 'X'
-                scream = True
-
-        reward = -10
-        """
-
 
         # return state, reward, done, info
         return self._get_current_state(scream, bump), reward, gameover, {}
