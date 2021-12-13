@@ -9,6 +9,8 @@ how to:
 
 https://www.novatec-gmbh.de/en/blog/creating-a-gym-environment/
 
+# how to install
+
 1. install gym 
 ```
 pip install --upgrade gym==0.10.0
