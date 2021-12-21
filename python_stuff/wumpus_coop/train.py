@@ -1,6 +1,8 @@
 import gym
 import wumpus_env
 import random
+import argparse
+import configparser
 import time
 import datetime
 from datetime import timedelta
@@ -10,10 +12,17 @@ def main():
     now = datetime.datetime.now()
     start_time = time.time()
 
+    parser = argparse.ArgumentParser('Parse configuration file')
+    parser.add_argument('--env_config', type=str, default='configs/env.config')
+    parser.add_argument('--output_dir', type=str, default='data/output')
+    args = parser.parse_args()
+    args.env_config = os.path.join(args.output_dir, os.path.basename(args.env_config))
+
     env = gym.make('wumpus-v0')
+    env.configure(args.env_config)
 
     #random environment
-    episodes = 10
+    episodes = 1
     for episode in range(1, episodes+1):
         state = env.reset()
         done = False

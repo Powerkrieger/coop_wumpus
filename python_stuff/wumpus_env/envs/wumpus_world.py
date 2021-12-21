@@ -1,6 +1,7 @@
 import numpy as np
 import copy
 import gym
+import configparser
 from gym import error, spaces, utils
 from gym.utils import seeding
 import os
@@ -11,27 +12,35 @@ class WumpusWorld(gym.Env):
 
     def __init__(self):
 
-        self.agents = []
+        self.robots = []
+        self.exit_locs = []
+        self.board = None
+        self.base_reward = None
+        self.high_reward = None
 
+    def configure(self, config):
         self.board = self.create_new_playing_field()
         self.board = np.array(self.board, dtype=object)
         self.base_reward = 1
         self.high_reward = 1000
 
+        env_config = configparser.RawConfigParser()
+        env_config.read(config)
+
+        self.num_robots = env_config.getint('env', 'num_robots')
+        self.wumpus = None
+
+
         # set initial location of the agent
-        self.agent_loc = None
-        self.wumpus_loc = None
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
                 if self.board[row, col] == 'A':
-                    self.agent_loc = (row, col)
+                    self.agents.append(Robot(env_config, row, col))
+                    self.exit_locs.append((row, col))
                 elif self.board[row, col] == 'W':
-                    self.wumpus_loc = (row, col)
-        assert self.agent_loc != None, 'Agent not found :('
+                    self.wumpus = Wumpus(env_config, row, col)
+        assert len(self.robots) > 0, 'Agent not found :('
 
-        # set the default heading as north -> 0: N, 1: E, 2: S, 3: W
-        self.agent_head = 0
-        self.exit_loc = copy.deepcopy(self.agent_loc)
         self.action_space = ['MoveUp','MoveDown','MoveLeft','MoveRight', 'PickUp', 'PutDown', 'Climb', 'Scream', 'Nothing']
         self.agent_has_arrow = True
         self.agent_has_gold = False
@@ -79,7 +88,7 @@ class WumpusWorld(gym.Env):
         scream = False
         bump = False
 
-        pas_loc = copy.deepcopy(self.agent_loc)
+
 
         if action_ind == 0:
             #north
@@ -149,32 +158,29 @@ class WumpusWorld(gym.Env):
 
         # set the agent on board! every agent??
         # new empty position
-        if pas_loc != self.agent_loc and self.board[self.agent_loc] == '.':
-            self.board[self.agent_loc] = 'A'
-        # caught by wumpus
-        elif pas_loc != self.agent_loc and self.board[self.agent_loc] == 'W':
-            self.board[self.agent_loc] = 'A&W'
-            reward = -self.high_reward
-            gameover = True
-        # fallen in pit
-        elif pas_loc != self.agent_loc and self.board[self.agent_loc] == 'P':
-            self.board[self.agent_loc] = 'A&P'
-            reward = -self.high_reward
-            gameover = True
-        # standing on gold
-        elif pas_loc != self.agent_loc and self.board[self.agent_loc] == 'G':
-            self.board[self.agent_loc] = 'A&G'
-        elif pas_loc == self.agent_loc:
-            bump = True
-            reward = -self.base_reward
+        for agent in agents:
+            old_agent_loc = copy.deepcopy(self.agent_loc)
+            old_wumpus_loc = copy.deepcopy(self.wumpus_loc)
+            if old_agent_loc != self.agent_loc and self.board[self.agent_loc] == '.':
+                self.board[self.agent_loc] = 'A'
+            # caught by wumpus
+            elif old_agent_loc != self.agent_loc and self.board[self.agent_loc] == 'W':
+                self.board[self.agent_loc] = 'A&W'
+                reward = -self.high_reward
+                gameover = True
+            # fallen in pit
+            elif old_agent_loc != self.agent_loc and self.board[self.agent_loc] == 'P':
+                self.board[self.agent_loc] = 'A&P'
+                reward = -self.high_reward
+                gameover = True
+            # standing on gold
+            elif old_agent_loc != self.agent_loc and self.board[self.agent_loc] == 'G':
+                self.board[self.agent_loc] = 'A&G'
+            elif old_agent_loc == self.agent_loc:
+                bump = True
+                reward = -self.base_reward
 
-        self.wumpus_action = self.wumpus.act(self.wumpus_action)
-        if update:
-            self.wumpus.step(self.wumpus_action)
-            self.wumpus_loc = Wumpus.move(self.wumpus_loc, self.wumpus_action)
-            self.board[self.wumpus_loc] = 'W'
-        if self.wumpus_action == (0,0):
-            self.wumpus_awake = False
+        if(self.wumpus.check(Wumpus.dist(agent_loc, wumpus_loc))
 
         # return state, reward, done, info
         return state, reward, gameover, {}
@@ -201,8 +207,6 @@ class WumpusWorld(gym.Env):
                     breeze = True
                 elif 'W' in self.board[loc]:
                     stench = True
-                    if not self.wumpus_awake:
-                        self.wumpus_action = dir
                 elif 'G' in self.board[loc]:
                     glitter = True
 
