@@ -1,11 +1,13 @@
-import gym
-import wumpus_env
-import random
 import argparse
-import configparser
-import time
 import datetime
+import os
+import random
+import time
+import wumpus_env
 from datetime import timedelta
+
+import gym
+
 
 def main():
     # for saving timestamp and elapsed time

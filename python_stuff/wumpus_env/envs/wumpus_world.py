@@ -2,10 +2,40 @@ import numpy as np
 import copy
 import gym
 import configparser
+
 from gym import error, spaces, utils
 from gym.utils import seeding
 import os
-from wumpus_env.envs.utils.wumpus import Wumpus
+from python_stuff.wumpus_env.envs.utils.wumpus import Wumpus
+from python_stuff.wumpus_env.envs.utils.robot import Robot
+
+
+def create_new_playing_field():
+    #change this to be able to randomize the playing field
+    board = []
+    layout_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'layouts', 'wumpus_4x4_book.lay')
+    # read the board file and construct the layout
+
+    try:
+        fin = open(layout_file, 'r', encoding='utf-8')
+    except:
+        print('Cannot read the layout file')
+
+    for line in fin.readlines():
+        if line.strip() == '':
+            break
+        tmp = line.strip().split(',')
+        if '' in tmp:
+            tmp.remove('')
+        board.append(tmp)
+
+    # check if board is valid
+    # this is not a valid test, since it only checks for being rectangular but that doesnt even have to be a criterion
+    # for i in range(len(board) - 1):
+    #   assert len(board[i]) == len(board[i+1]), 'Board is not valid!'
+
+    return board
+
 
 class WumpusWorld(gym.Env):
     metadata = {'render.modes': ['text']}
@@ -19,7 +49,7 @@ class WumpusWorld(gym.Env):
         self.high_reward = None
 
     def configure(self, config):
-        self.board = self.create_new_playing_field()
+        self.board = create_new_playing_field()
         self.board = np.array(self.board, dtype=object)
         self.base_reward = 1
         self.high_reward = 1000
@@ -47,32 +77,6 @@ class WumpusWorld(gym.Env):
         self.wumpus_action = (0, 0)
         self.wumpus_awake = False
         self.wumpus = Wumpus(self.wumpus_loc[0], self.wumpus_loc[1])
-
-    def create_new_playing_field(self):
-        #change this to be able to randomize the playing field
-        board = []
-        layout_file=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'layouts', 'wumpus_4x4_book.lay')
-        # read the board file and construct the layout
-
-        try:
-            fin = open(layout_file, 'r', encoding='utf-8')
-        except:
-            print('Cannot read the layout file')
-
-        for line in fin.readlines():
-            if line.strip() == '':
-                break
-            tmp = line.strip().split(',')
-            if '' in tmp:
-                tmp.remove('')
-            board.append(tmp)
-
-        # check if board is valid
-        # this is not a valid test, since it only checks for being rechteckig but that doesnt even have to be a criterion
-        for i in range(len(board) - 1):
-            assert len(board[i]) == len(board[i+1]), 'Board is not valid!'
-
-        return board
 
     def reset(self):
         self.__init__()
@@ -158,7 +162,7 @@ class WumpusWorld(gym.Env):
 
         # set the agent on board! every agent??
         # new empty position
-        for agent in agents:
+        for agent in self.agents:
             old_agent_loc = copy.deepcopy(self.agent_loc)
             old_wumpus_loc = copy.deepcopy(self.wumpus_loc)
             if old_agent_loc != self.agent_loc and self.board[self.agent_loc] == '.':
@@ -180,7 +184,8 @@ class WumpusWorld(gym.Env):
                 bump = True
                 reward = -self.base_reward
 
-        if(self.wumpus.check(Wumpus.dist(agent_loc, wumpus_loc))
+        self.wumpus.check(self.agent_loc, self.wumpus_loc)
+
 
         # return state, reward, done, info
         return state, reward, gameover, {}
