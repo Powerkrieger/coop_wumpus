@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 
 class Agent(object):
@@ -18,11 +20,3 @@ class Agent(object):
 
     def get_loc(self):
         return self.loc
-
-    @abc.abstractmethod
-    def act(self, ob):
-        """
-        Compute state using received observation and pass it to policy
-
-        """
-        return

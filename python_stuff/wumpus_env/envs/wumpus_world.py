@@ -6,12 +6,12 @@ import configparser
 from gym import error, spaces, utils
 from gym.utils import seeding
 import os
-from python_stuff.wumpus_env.envs.utils.wumpus import Wumpus
-from python_stuff.wumpus_env.envs.utils.robot import Robot
+from wumpus_env.envs.utils.wumpus import Wumpus
+from wumpus_env.envs.utils.robot import Robot
 
 
 def create_new_playing_field():
-    #change this to be able to randomize the playing field
+    # change this to be able to randomize the playing field
     board = []
     layout_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'layouts', 'wumpus_4x4_book.lay')
     # read the board file and construct the layout
@@ -42,108 +42,110 @@ class WumpusWorld(gym.Env):
 
     def __init__(self):
 
-        self.robots = []
-        self.exit_locs = []
+        self.exit_locs = None
+        self.robots = None
+        self.wumpus_awake = None
+        self.robot_has_gold = None
+        self.robot_has_arrow = None
+        
         self.board = None
         self.base_reward = None
         self.high_reward = None
+        self.config = None
 
     def configure(self, config):
+        self.robots = []
+        self.num_robots = 0
+        self.exit_locs = []
         self.board = create_new_playing_field()
         self.board = np.array(self.board, dtype=object)
         self.base_reward = 1
         self.high_reward = 1000
-
+        self.config = config
         env_config = configparser.RawConfigParser()
         env_config.read(config)
 
         self.num_robots = env_config.getint('env', 'num_robots')
         self.wumpus = None
 
-
         # set initial location of the agent
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
                 if self.board[row, col] == 'A':
-                    self.agents.append(Robot(env_config, row, col))
-                    self.exit_locs.append((row, col))
+                    self.robots.append(Robot(env_config, row, col, self.num_robots))
+                    self.num_robots += 1
+                    self.exit_locs.append((col, row))
                 elif self.board[row, col] == 'W':
                     self.wumpus = Wumpus(env_config, row, col)
         assert len(self.robots) > 0, 'Agent not found :('
 
-        self.action_space = ['MoveUp','MoveDown','MoveLeft','MoveRight', 'PickUp', 'PutDown', 'Climb', 'Scream', 'Nothing']
-        self.agent_has_arrow = True
-        self.agent_has_gold = False
+        self.action_space = ['MoveUp', 'MoveDown', 'MoveLeft', 'MoveRight', 'PickUp', 'PutDown', 'Climb', 'Scream',
+                             'Nothing']
+        self.robot_has_arrow = True
+        self.robot_has_gold = False
         self.wumpus_action = (0, 0)
         self.wumpus_awake = False
-        self.wumpus = Wumpus(self.wumpus_loc[0], self.wumpus_loc[1])
 
     def reset(self):
-        self.__init__()
+        self.configure(self.config)
         return self._get_current_state(False, False)
 
-    def step(self, action, update=True):
-        '''
-        performs the excat action (not noisy!)
-        '''
-        assert action in self.action_space, 'Unknown action!'
-        action_ind = self.action_space.index(action)
+    def exec_action(self, action_ind, robot):
         gameover = False
         scream = False
-        bump = False
-
-
 
         if action_ind == 0:
-            #north
-            if self.agent_head == 0 and self.agent_loc[0] > 0:
-                self.board[self.agent_loc] = '.' if self.board[self.agent_loc] == 'A' else self.board[self.agent_loc].replace('A&', '')
-                self.agent_loc = (self.agent_loc[0] - 1, self.agent_loc[1])
-            self.agent_head = 0
+            # north
+            if robot.loc[0] > 0:
+                self.board[robot.loc] = '.' if self.board[robot.loc] == 'A' else self.board[robot.loc].replace('A&',
+                                                                                                               '')
+                robot.loc = (robot.loc[0] - 1, robot.loc[1])
             reward = -self.base_reward
 
         elif action_ind == 1:
-            #south
-            if self.agent_head == 2 and self.agent_loc[0] < len(self.board) - 1:
-                self.board[self.agent_loc] = '.' if self.board[self.agent_loc] == 'A' else self.board[self.agent_loc].replace('A&', '')
-                self.agent_loc = (self.agent_loc[0] + 1, self.agent_loc[1])
-            self.agent_head = 2
+            # south
+            if robot.loc[0] < len(self.board) - 1:
+                self.board[robot.loc] = '.' if self.board[robot.loc] == 'A' else self.board[robot.loc].replace('A&',
+                                                                                                               '')
+                robot.loc = (robot.loc[0] + 1, robot.loc[1])
             reward = -self.base_reward
 
         elif action_ind == 2:
-            #west
-            if self.agent_head == 3 and self.agent_loc[1] > 0:
-                self.board[self.agent_loc] = '.' if self.board[self.agent_loc] == 'A' else self.board[self.agent_loc].replace('A&', '')
-                self.agent_loc = (self.agent_loc[0], self.agent_loc[1] - 1)
-            self.agent_head = 3
+            # west
+            if robot.loc[1] > 0:
+                self.board[robot.loc] = '.' if self.board[robot.loc] == 'A' else self.board[robot.loc].replace('A&',
+                                                                                                               '')
+                robot.loc = (robot.loc[0], robot.loc[1] - 1)
             reward = -self.base_reward
 
         elif action_ind == 3:
-            #east
-            if self.agent_head == 1 and self.agent_loc[1] < len(self.board[0]) - 1:
-                self.board[self.agent_loc] = '.' if self.board[self.agent_loc] == 'A' else self.board[self.agent_loc].replace('A&', '')
-                self.agent_loc = (self.agent_loc[0], self.agent_loc[1] + 1)
-            self.agent_head = 1
+            # east
+            if robot.loc[1] < len(self.board[0]) - 1:
+                self.board[robot.loc] = '.' if self.board[robot.loc] == 'A' else self.board[robot.loc].replace('A&',
+                                                                                                               '')
+                robot.loc = (robot.loc[0], robot.loc[1] + 1)
             reward = -self.base_reward
 
         elif action_ind == 4:
-            #pick up
-            if self.board[self.agent_loc] == 'A&G':
-                self.board[self.agent_loc] = 'A'
-                self.agent_has_gold = True
+            # pick up
+            if self.board[robot.loc] == 'A&G':
+                self.board[robot.loc] = 'A'
+                self.robot_has_gold = True
             reward = -self.base_reward
+
         elif action_ind == 5:
-            #put down
-            if self.agent_has_gold and self.board[self.agent_loc] == 'A':
-                self.board[self.agent_loc] = 'A&G'
-                self.agent_has_gold = False
+            # put down
+            if self.robot_has_gold and self.board[robot.loc] == 'A':
+                self.board[robot.loc] = 'A&G'
+                self.robot_has_gold = False
             reward = -self.base_reward
+
         elif action_ind == 6:
             # climb
-            if self.agent_loc == self.exit_loc and self.agent_has_gold:
+            if robot.loc == self.exit_locs[robot.num] and self.robot_has_gold:
                 reward = self.high_reward
                 gameover = True
-            elif self.agent_loc == self.exit_loc:
+            elif robot.loc == self.exit_locs[robot.num]:
                 reward = -self.high_reward
                 gameover = True
             else:
@@ -155,65 +157,105 @@ class WumpusWorld(gym.Env):
             scream = True
             reward = -self.base_reward
         elif action_ind == 8:
-            #Nothing
+            # Nothing
             reward = -self.base_reward
 
-        state = self._get_current_state(scream, bump)
+        return reward, scream, gameover
+
+    def step(self, action, update=True):
+        '''
+        performs the exact action (not noisy!)
+        '''
+        assert action in self.action_space, 'Unknown action!'
+        action_ind = self.action_space.index(action)
+        gameover = False
+        scream = False
+        bump = False
 
         # set the agent on board! every agent??
         # new empty position
-        for agent in self.agents:
-            old_agent_loc = copy.deepcopy(self.agent_loc)
-            old_wumpus_loc = copy.deepcopy(self.wumpus_loc)
-            if old_agent_loc != self.agent_loc and self.board[self.agent_loc] == '.':
-                self.board[self.agent_loc] = 'A'
+        for robot in self.robots:
+            old_robot_loc = copy.deepcopy(robot.loc)
+            old_wumpus_loc = copy.deepcopy(self.wumpus.loc)
+
+            self.wumpus.check(old_robot_loc, robot.num)
+
+            # stuff needs to happen here
+
+            reward, scream, gameover = self.exec_action(action_ind, robot)
+
+            # if wumpus moved, erase old position
+            if old_wumpus_loc != self.wumpus.loc:
+                self.board[old_wumpus_loc] = '.' if self.board[old_wumpus_loc] == 'W' else self.board[
+                    old_wumpus_loc].replace('W&', '')
+
+            # moved
+            if old_wumpus_loc != self.wumpus.loc and self.board[self.wumpus.loc] == '.':
+                self.board[self.wumpus.loc] = 'W'
             # caught by wumpus
-            elif old_agent_loc != self.agent_loc and self.board[self.agent_loc] == 'W':
-                self.board[self.agent_loc] = 'A&W'
+            elif old_wumpus_loc != self.wumpus.loc and self.board[self.wumpus.loc] == 'A':
+                self.board[robot.loc] = 'A&W'
+            # standing on gold
+            elif old_wumpus_loc != self.wumpus.loc and self.board[self.wumpus.loc] == 'G':
+                self.board[self.wumpus.loc] = 'W&G'
+            # walked against wall
+            elif old_wumpus_loc == self.wumpus.loc:
+                pass
+
+            # moved
+            if old_robot_loc != robot.loc and self.board[robot.loc] == '.':
+                self.board[robot.loc] = 'A'
+            # caught by wumpus
+            elif old_robot_loc != robot.loc and self.board[robot.loc] == 'W':
+                self.board[robot.loc] = 'A&W'
                 reward = -self.high_reward
                 gameover = True
             # fallen in pit
-            elif old_agent_loc != self.agent_loc and self.board[self.agent_loc] == 'P':
-                self.board[self.agent_loc] = 'A&P'
+            elif old_robot_loc != robot.loc and self.board[robot.loc] == 'P':
+                self.board[robot.loc] = 'A&P'
                 reward = -self.high_reward
                 gameover = True
             # standing on gold
-            elif old_agent_loc != self.agent_loc and self.board[self.agent_loc] == 'G':
-                self.board[self.agent_loc] = 'A&G'
-            elif old_agent_loc == self.agent_loc:
+            elif old_robot_loc != robot.loc and self.board[robot.loc] == 'G':
+                self.board[robot.loc] = 'A&G'
+            # walked against wall
+            elif old_robot_loc == robot.loc and self.board[robot.loc] == 'A&W':
+                reward = -self.high_reward
+                gameover = True
+            elif old_robot_loc == robot.loc:
                 bump = True
                 reward = -self.base_reward
 
-        self.wumpus.check(self.agent_loc, self.wumpus_loc)
-
+        state = self._get_current_state(scream, bump)
 
         # return state, reward, done, info
         return state, reward, gameover, {}
 
     def _get_current_state(self, scream, bump):
-        # agent_location and current position things!
+        # robot.location and current position things!
         # [stench, breeze, glitter, bump, scream]
-        stench = False
-        breeze = False
-        glitter = False
+        stench = [False] * self.num_robots
+        breeze = [False] * self.num_robots
+        glitter = [False] * self.num_robots
 
-        agent_fours = [
-            # ob and location, ob for moving the wumpus therefor pointing in opposite direction
-            ((1,0),(self.agent_loc[0] - 1, self.agent_loc[1])) if self.agent_loc[0] - 1 >= 0 else (None,None),
-            ((-1,0),(self.agent_loc[0] + 1, self.agent_loc[1])) if self.agent_loc[0] + 1 < len(self.board) else (None,None),
-            ((0,1),(self.agent_loc[0], self.agent_loc[1] - 1)) if self.agent_loc[1] - 1 >= 0 else (None,None),
-            ((0,-1),(self.agent_loc[0], self.agent_loc[1] + 1)) if self.agent_loc[1] + 1 < len(self.board[0]) else (None,None),
-            ((0,0),(self.agent_loc[0], self.agent_loc[1]))
-        ]
+        for robot in self.robots:
+            agent_fours = [
+                # ob and location, ob for moving the wumpus therefor pointing in opposite direction
+                (robot.loc[0] - 1, robot.loc[1]) if robot.loc[0] - 1 >= 0 else None,
+                (robot.loc[0] + 1, robot.loc[1]) if robot.loc[0] + 1 < len(self.board) else None,
+                (robot.loc[0], robot.loc[1] - 1) if robot.loc[1] - 1 >= 0 else None,
+                (robot.loc[0], robot.loc[1] + 1) if robot.loc[1] + 1 < len(self.board[0]) else None,
+                (robot.loc[0], robot.loc[1])
+            ]
 
-        for (dir, loc) in agent_fours:
-            if loc != None:
-                if 'P' in self.board[loc]:
-                    breeze = True
-                elif 'W' in self.board[loc]:
-                    stench = True
-                elif 'G' in self.board[loc]:
-                    glitter = True
+            for loc in agent_fours:
+                if loc is not None:
+                    if 'P' in self.board[loc]:
+                        breeze.append(True)
+                    elif 'W' in self.board[loc]:
+                        stench.append(True)
+                    elif 'G' in self.board[loc]:
+                        glitter.append(True)
 
         return [stench, breeze, glitter, bump, scream]
 
@@ -232,16 +274,8 @@ class WumpusWorld(gym.Env):
                 if 'A' not in self.board[row, col]:
                     printer += self.board[row, col] + '   |   '
                 else:
-                    # print agent in a different way -> use heading
+                    # print agent
                     p = self.board[row, col]
-                    if self.agent_head == 0:
-                        p = p.replace('A', '^')
-                    elif self.agent_head == 1:
-                        p = p.replace('A', '>')
-                    elif self.agent_head == 2:
-                        p = p.replace('A', 'v')
-                    elif self.agent_head == 3:
-                        p = p.replace('A', '<')
                     if len(p) > 1:
                         p += ' |   '
                     else:
