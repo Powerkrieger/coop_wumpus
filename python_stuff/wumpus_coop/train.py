@@ -39,11 +39,13 @@ def main():
         a = ['MoveDown', 'MoveDown', 'MoveLeft', 'MoveLeft', 'MoveLeft', 'MoveDown', 'MoveUp']
         while not done:
             env.render()
-            #action = random.choice(env.action_space)
-            action = a.pop()
-            print(action)
-            n_state, reward, done, info = env.step(action)
-            score += reward
+            actions = []
+            actions.append(random.choice(env.action_space))
+            #action = a.pop()
+            print(actions)
+            n_state, rewards, done, info = env.step(actions)
+            score += rewards[0]
+        env.render()
         print('Episode:{} Score:{}'.format(episode, score))
 
     elapsed_time_secs = time.time() - start_time

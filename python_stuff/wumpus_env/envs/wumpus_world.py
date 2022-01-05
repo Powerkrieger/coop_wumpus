@@ -65,7 +65,7 @@ class WumpusWorld(gym.Env):
         env_config = configparser.RawConfigParser()
         env_config.read(config)
 
-        self.num_robots = env_config.getint('env', 'num_robots')
+        # self.final_num_robots = env_config.getint('env', 'num_robots')
         self.wumpus = None
 
         # set initial location of the agent
@@ -88,7 +88,10 @@ class WumpusWorld(gym.Env):
 
     def reset(self):
         self.configure(self.config)
-        return self._get_current_state(False, False)
+        states = []
+        for robot in self.robots:
+            states.append(self._get_current_state(robot, False, False))
+        return states
 
     def exec_action(self, action_ind, robot):
         gameover = False
@@ -142,6 +145,8 @@ class WumpusWorld(gym.Env):
 
         elif action_ind == 6:
             # climb
+            print(self.exit_locs)
+            print(robot.num)
             if robot.loc == self.exit_locs[robot.num] and self.robot_has_gold:
                 reward = self.high_reward
                 gameover = True
@@ -162,19 +167,21 @@ class WumpusWorld(gym.Env):
 
         return reward, scream, gameover
 
-    def step(self, action, update=True):
+    def step(self, actions, update=True):
         '''
         performs the exact action (not noisy!)
         '''
-        assert action in self.action_space, 'Unknown action!'
-        action_ind = self.action_space.index(action)
-        gameover = False
-        scream = False
         bump = False
+        states = []
+        rewards = []
+        gameovers = []
+
 
         # set the agent on board! every agent??
         # new empty position
-        for robot in self.robots:
+        for robot, action in zip(self.robots, actions):
+            assert action in self.action_space, 'Unknown action! : ' +  action
+            action_ind = self.action_space.index(action)
             old_robot_loc = copy.deepcopy(robot.loc)
             old_wumpus_loc = copy.deepcopy(self.wumpus.loc)
 
@@ -226,36 +233,40 @@ class WumpusWorld(gym.Env):
                 bump = True
                 reward = -self.base_reward
 
-        state = self._get_current_state(scream, bump)
+            state = self._get_current_state(robot, scream, bump)
+            states.append(state)
+            rewards.append(reward)
+            gameovers.append(gameover)
+
+        done = True if sum(1 for x in gameovers if x) == self.num_robots else False
 
         # return state, reward, done, info
-        return state, reward, gameover, {}
+        return states, rewards, done, {}
 
-    def _get_current_state(self, scream, bump):
+    def _get_current_state(self, robot, scream, bump):
         # robot.location and current position things!
         # [stench, breeze, glitter, bump, scream]
         stench = [False] * self.num_robots
         breeze = [False] * self.num_robots
         glitter = [False] * self.num_robots
 
-        for robot in self.robots:
-            agent_fours = [
-                # ob and location, ob for moving the wumpus therefor pointing in opposite direction
-                (robot.loc[0] - 1, robot.loc[1]) if robot.loc[0] - 1 >= 0 else None,
-                (robot.loc[0] + 1, robot.loc[1]) if robot.loc[0] + 1 < len(self.board) else None,
-                (robot.loc[0], robot.loc[1] - 1) if robot.loc[1] - 1 >= 0 else None,
-                (robot.loc[0], robot.loc[1] + 1) if robot.loc[1] + 1 < len(self.board[0]) else None,
-                (robot.loc[0], robot.loc[1])
-            ]
+        agent_fours = [
+            # ob and location, ob for moving the wumpus therefor pointing in opposite direction
+            (robot.loc[0] - 1, robot.loc[1]) if robot.loc[0] - 1 >= 0 else None,
+            (robot.loc[0] + 1, robot.loc[1]) if robot.loc[0] + 1 < len(self.board) else None,
+            (robot.loc[0], robot.loc[1] - 1) if robot.loc[1] - 1 >= 0 else None,
+            (robot.loc[0], robot.loc[1] + 1) if robot.loc[1] + 1 < len(self.board[0]) else None,
+            (robot.loc[0], robot.loc[1])
+        ]
 
-            for loc in agent_fours:
-                if loc is not None:
-                    if 'P' in self.board[loc]:
-                        breeze.append(True)
-                    elif 'W' in self.board[loc]:
-                        stench.append(True)
-                    elif 'G' in self.board[loc]:
-                        glitter.append(True)
+        for loc in agent_fours:
+            if loc is not None:
+                if 'P' in self.board[loc]:
+                    breeze.append(True)
+                elif 'W' in self.board[loc]:
+                    stench.append(True)
+                elif 'G' in self.board[loc]:
+                    glitter.append(True)
 
         return [stench, breeze, glitter, bump, scream]
 
