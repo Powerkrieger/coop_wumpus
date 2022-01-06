@@ -48,11 +48,11 @@ class Wumpus(Agent):
                 self.on_way_home = True
                 action = (0, 0)
             elif abs(self.home_x - (self.loc[0] + ob[0])) < 2 and abs(self.home_y - (self.loc[1] + ob[1])) < 2:
-                print("if")
+                # print("if")
                 action = ob
                 self.way_home.append((-ob[0], -ob[1]))
             else:
-                print("else")
+                # print("else")
                 self.on_way_home = True
                 action = (0, 0)
         else:
@@ -74,7 +74,7 @@ class Wumpus(Agent):
                 pass
         else:
             if self.check_validity(sub(ob, self.loc)):
-                print("wake")
+                # print("wake")
                 self.wake()
                 self.follow_agent_num = num
                 self.act(sub(ob, self.loc))
@@ -86,7 +86,7 @@ class Wumpus(Agent):
         """
         Perform an action and update the state
         """
-        print("action1 ", action)
+        # print("action1 ", action)
         assert self.check_validity(action)
         self.set_loc((self.loc[0] + action[0], self.loc[1] + action[1]))
 

@@ -79,6 +79,8 @@ class WumpusWorld(gym.Env):
                     self.wumpus = Wumpus(env_config, row, col)
         assert len(self.robots) > 0, 'Agent not found :('
 
+        # self.action_space = spaces.Discrete(['MoveUp', 'MoveDown', 'MoveLeft', 'MoveRight', 'PickUp', 'PutDown',
+                                             # 'Climb', 'Scream', 'Nothing'])
         self.action_space = spaces.Discrete(9)
         self.observation_space = spaces.Discrete(32)
         self.robot_has_arrow = True
@@ -145,10 +147,8 @@ class WumpusWorld(gym.Env):
 
         elif action_ind == 6:
             # climb
-            print(self.exit_locs)
-            print(robot.num)
             if robot.loc == self.exit_locs[robot.num] and self.robot_has_gold:
-                reward = self.high_reward
+                reward = 10*self.high_reward
                 gameover = True
             elif robot.loc == self.exit_locs[robot.num]:
                 reward = -self.high_reward
@@ -179,13 +179,14 @@ class WumpusWorld(gym.Env):
 
         # set the agent on board! every agent??
         # new empty position
-        for robot, action in zip(self.robots, actions):
+        for robot, action in zip(self.robots, [actions]):
             assert action in self.action_space, 'Unknown action! : ' +  action
-            action_ind = self.action_space.index(action)
+            # action_ind = self.action_space.index(action)
+            action_ind = action
             old_robot_loc = copy.deepcopy(robot.loc)
             old_wumpus_loc = copy.deepcopy(self.wumpus.loc)
 
-            self.wumpus.check(old_robot_loc, robot.num)
+            # self.wumpus.check(old_robot_loc, robot.num)
 
             # stuff needs to happen here
 
@@ -241,7 +242,7 @@ class WumpusWorld(gym.Env):
         done = True if sum(1 for x in gameovers if x) == self.num_robots else False
 
         # return state, reward, done, info
-        return observations[0], rewards, done, {}
+        return observations[0], rewards[0], done, {}
 
     def _get_current_state(self, robot, scream, bump):
         # robot.location and current position things!
@@ -268,7 +269,14 @@ class WumpusWorld(gym.Env):
                 elif 'G' in self.board[loc]:
                     glitter.append(True)
 
-        return [stench, breeze, glitter, bump, scream]
+        obs = [stench, breeze, glitter, bump, scream]
+
+        confignum = 0
+        for x in range(len(obs)):
+            if obs[x]:
+                confignum = confignum + np.power(2, x)
+
+        return confignum
 
     def get_action_space(self):
         return self.action_space

@@ -48,13 +48,14 @@ def main():
     model.save("dqn_test")
     print("Saved Model")
 
-    del model
+    '''del model
 
     model = DQN.load("dqn_test")
     print("Loaded Model")
 
     obs = env.reset()
-    print("Reset Env")
+    print("Reset Env")'''
+    obs = env.reset()
 
     # random environment
     episodes = train_config.getint('train', 'train_episodes')
@@ -66,16 +67,14 @@ def main():
         observations = env.observation_space
         print(observations)
 
-        a = ['MoveDown', 'MoveDown', 'MoveLeft', 'MoveLeft', 'MoveLeft', 'MoveDown', 'MoveUp']
+        a = ['MoveUp', 'MoveDown', 'MoveLeft', 'MoveRight', 'PickUp', 'PutDown', 'Climb', 'Scream', 'Nothing']
         while not done:
             if rend == 1: env.render()
             action, _states = model.predict(obs, deterministic=True)
-            #action = random.choice(env.action_space)
-            #action = a.pop()
-            print(actions)
-            if rend == 1: print(action)
-            obs, reward, done, info = env.step(action)
-            score += rewards[0]
+            print(action)
+            if rend == 1: print(a[action])
+            obs, rewards, done, info = env.step(action)
+            score += rewards
         if rend == 1: print('Episode:{} Score:{}'.format(episode, score))
 
     elapsed_time_secs = time.time() - start_time
