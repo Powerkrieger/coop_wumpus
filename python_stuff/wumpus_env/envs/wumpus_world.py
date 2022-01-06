@@ -88,10 +88,10 @@ class WumpusWorld(gym.Env):
 
     def reset(self):
         self.configure(self.config)
-        states = []
+        observations = []
         for robot in self.robots:
-            states.append(self._get_current_state(robot, False, False))
-        return states
+            observations.append(self._get_current_state(robot, False, False))
+        return observations[0]
 
     def exec_action(self, action_ind, robot):
         gameover = False
@@ -172,7 +172,7 @@ class WumpusWorld(gym.Env):
         performs the exact action (not noisy!)
         '''
         bump = False
-        states = []
+        observations = []
         rewards = []
         gameovers = []
 
@@ -234,14 +234,14 @@ class WumpusWorld(gym.Env):
                 reward = -self.base_reward
 
             state = self._get_current_state(robot, scream, bump)
-            states.append(state)
+            observations.append(state)
             rewards.append(reward)
             gameovers.append(gameover)
 
         done = True if sum(1 for x in gameovers if x) == self.num_robots else False
 
         # return state, reward, done, info
-        return states, rewards, done, {}
+        return observations[0], rewards, done, {}
 
     def _get_current_state(self, robot, scream, bump):
         # robot.location and current position things!
