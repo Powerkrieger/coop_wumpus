@@ -1,9 +1,15 @@
+
 import gym
 import numpy as np
-import wumpus_env
+
+import argparse
+import configparser
+import datetime
+import os
+
 import random
 import time
-import datetime
+import wumpus_env
 from datetime import timedelta
 
 from tensorflow.keras.models import Sequential
@@ -28,7 +34,17 @@ def main():
     now = datetime.datetime.now()
     start_time = time.time()
 
+    parser = argparse.ArgumentParser('Parse configuration file')
+    parser.add_argument('--env_config', type=str, default='config/env.config')
+    parser.add_argument('--train_config', type=str, default='config/env.config')
+    parser.add_argument('--output_dir', type=str, default='data/output')
+    args = parser.parse_args()
+
+    train_config = configparser.RawConfigParser()
+    train_config.read(args.train_config)
+
     env = gym.make('wumpus-v0')
+    env.configure(args.env_config)
 
     states = np.arange(32)
     actions = env.action_space
@@ -37,7 +53,7 @@ def main():
     model.summary()
 
     # random environment
-    episodes = 10
+    episodes = train_config.getint('train', 'train_episodes')
     for episode in range(1, episodes + 1):
         state = env.reset()
         done = False
@@ -46,12 +62,15 @@ def main():
         observations = env.observation_space
         print(observations)
 
+        a = ['MoveDown', 'MoveDown', 'MoveLeft', 'MoveLeft', 'MoveLeft', 'MoveDown', 'MoveUp']
         while not done:
             if rend == 1: env.render()
             action = random.choice(env.action_space)
+            #action = a.pop()
+            print(actions)
             if rend == 1: print(action)
             n_state, reward, done, info = env.step(action)
-            score += reward
+            score += rewards[0]
         if rend == 1: print('Episode:{} Score:{}'.format(episode, score))
 
     elapsed_time_secs = time.time() - start_time
