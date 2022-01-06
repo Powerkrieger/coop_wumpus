@@ -79,8 +79,8 @@ class WumpusWorld(gym.Env):
                     self.wumpus = Wumpus(env_config, row, col)
         assert len(self.robots) > 0, 'Agent not found :('
 
-        self.action_space = ['MoveUp', 'MoveDown', 'MoveLeft', 'MoveRight', 'PickUp', 'PutDown', 'Climb', 'Scream',
-                             'Nothing']
+        self.action_space = spaces.Discrete(9)
+        self.observation_space = spaces.Discrete(32)
         self.robot_has_arrow = True
         self.robot_has_gold = False
         self.wumpus_action = (0, 0)

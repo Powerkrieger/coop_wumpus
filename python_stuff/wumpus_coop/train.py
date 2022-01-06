@@ -36,7 +36,7 @@ def main():
     train_config = configparser.RawConfigParser()
     train_config.read(args.train_config)
 
-    env = DummyVecEnv([lambda: WumpusWorld()])
+    env = gym.make("wumpus-v0")
     env.configure(args.env_config)
     
     print("Made environment")
