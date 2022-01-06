@@ -53,6 +53,8 @@ class WumpusWorld(gym.Env):
         self.high_reward = None
         self.config = None
 
+        self.gold_loc = None
+
     def configure(self, config):
         self.robots = []
         self.num_robots = 0
@@ -77,15 +79,16 @@ class WumpusWorld(gym.Env):
                     self.exit_locs.append((col, row))
                 elif self.board[row, col] == 'W':
                     self.wumpus = Wumpus(env_config, row, col)
+                elif self.board[row, col] == 'G':
+                    self.gold_loc = (row, col)
         assert len(self.robots) > 0, 'Agent not found :('
 
         # self.action_space = spaces.Discrete(['MoveUp', 'MoveDown', 'MoveLeft', 'MoveRight', 'PickUp', 'PutDown',
                                              # 'Climb', 'Scream', 'Nothing'])
         self.action_space = spaces.Discrete(9)
-        self.observation_space = spaces.Discrete(32)
+        self.observation_space = spaces.Discrete(64)
         self.robot_has_arrow = True
         self.robot_has_gold = False
-        self.wumpus_action = (0, 0)
         self.wumpus_awake = False
 
     def reset(self):
@@ -269,7 +272,10 @@ class WumpusWorld(gym.Env):
                 elif 'G' in self.board[loc]:
                     glitter.append(True)
 
-        obs = [stench, breeze, glitter, bump, scream]
+        gold_h = (abs(robot.loc[0] - self.gold_loc[0]), abs(robot.loc[1] - self.gold_loc[1]))
+        print(gold_h)
+
+        obs = [stench, breeze, glitter, bump, scream, gold_h]
 
         confignum = 0
         for x in range(len(obs)):

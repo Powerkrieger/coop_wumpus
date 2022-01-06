@@ -48,14 +48,13 @@ def main():
     model.save("dqn_test")
     print("Saved Model")
 
-    '''del model
+    del model
 
     model = DQN.load("dqn_test")
     print("Loaded Model")
 
     obs = env.reset()
-    print("Reset Env")'''
-    obs = env.reset()
+    print("Reset Env")
 
     # random environment
     episodes = train_config.getint('train', 'train_episodes')
@@ -71,7 +70,6 @@ def main():
         while not done:
             if rend == 1: env.render()
             action, _states = model.predict(obs, deterministic=True)
-            print(action)
             if rend == 1: print(a[action])
             obs, rewards, done, info = env.step(action)
             score += rewards
