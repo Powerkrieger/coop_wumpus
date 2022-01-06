@@ -12,45 +12,49 @@ import time
 import wumpus_env
 from datetime import timedelta
 
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Flatten
-from tensorflow.keras.optimizers import Adam
-
-
-def build_model(states, actions):
-    model = Sequential()
-    model.add(Flatten(input_shape=(1, states)))
-    model.add(Dense(24, activation="relu"))
-    model.add(Dense(24, activation="relu"))
-    model.add(Dense(actions, activation="linear"))
-    return model
+from stable_baselines3 import DQN
+from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
+from wumpus_env.envs import WumpusWorld
 
 # outuput visible?
-rend = 0
 
+rend = 1
 
 def main():
     # for saving timestamp and elapsed time
     now = datetime.datetime.now()
     start_time = time.time()
 
+    print("Main started")
+    # evaluate arguments
     parser = argparse.ArgumentParser('Parse configuration file')
     parser.add_argument('--env_config', type=str, default='config/env.config')
     parser.add_argument('--train_config', type=str, default='config/env.config')
     parser.add_argument('--output_dir', type=str, default='data/output')
     args = parser.parse_args()
-
+    # read config
     train_config = configparser.RawConfigParser()
     train_config.read(args.train_config)
 
-    env = gym.make('wumpus-v0')
+    env = DummyVecEnv([lambda: WumpusWorld()])
     env.configure(args.env_config)
+    
+    print("Made environment")
 
-    states = np.arange(32)
-    actions = env.action_space
+    model = DQN("MlpPolicy", env, verbose=1)
+    print("Made Model")
+    model.learn(total_timesteps=10000, log_interval=4)
+    print("Trained Model")
+    model.save("dqn_test")
+    print("Saved Model")
 
-    model = build_model(states, actions)
-    model.summary()
+    del model
+
+    model = DQN.load("dqn_test")
+    print("Loaded Model")
+
+    obs = env.reset()
+    print("Reset Env")
 
     # random environment
     episodes = train_config.getint('train', 'train_episodes')
@@ -65,11 +69,12 @@ def main():
         a = ['MoveDown', 'MoveDown', 'MoveLeft', 'MoveLeft', 'MoveLeft', 'MoveDown', 'MoveUp']
         while not done:
             if rend == 1: env.render()
-            action = random.choice(env.action_space)
+            action, _states = model.predict(obs, deterministic=True)
+            #action = random.choice(env.action_space)
             #action = a.pop()
             print(actions)
             if rend == 1: print(action)
-            n_state, reward, done, info = env.step(action)
+            obs, reward, done, info = env.step(action)
             score += rewards[0]
         if rend == 1: print('Episode:{} Score:{}'.format(episode, score))
 
