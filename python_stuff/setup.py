@@ -5,7 +5,7 @@ from setuptools import setup
 setup(
     name = 'coop_wumpus',
     version = '0.1',
-    install_requires = ['gym', 'numpy'], #gym in version 0.10.0
+    install_requires = ['gym', 'numpy', 'stable_baselines3'], #gym in version 0.10.0
     description = 'Coop Wumpus World environment for gym',
     author = 'die elitären 31er',
     url = 'https://github.com/Powerkrieger/coop_wumpus',

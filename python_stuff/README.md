@@ -11,15 +11,20 @@ https://www.novatec-gmbh.de/en/blog/creating-a-gym-environment/
 
 # how to install
 
-1. install gym 
+1. install packages
 ```
 pip install --upgrade gym==0.10.0
+pip install stable-baselines3
+```
+1,5. torch
+```
+pip3 install torch==1.8.2+cpu torchvision==0.9.2+cpu torchaudio==0.8.2 -f https://download.pytorch.org/whl/lts/1.8/torch_lts.html
 ```
 2. Install wumpus environment into pip
 ```
 pip install -e .
 ```
-3. execute train.py 
+3. execute train.py
 ```
 python train.py
 ```
