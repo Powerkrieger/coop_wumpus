@@ -6,35 +6,39 @@ import time
 import datetime
 from datetime import timedelta
 
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Flatten
-from tensorflow.keras.optimizers import Adam
-
-
-def build_model(states, actions):
-    model = Sequential()
-    model.add(Flatten(input_shape=(1, states)))
-    model.add(Dense(24, activation="relu"))
-    model.add(Dense(24, activation="relu"))
-    model.add(Dense(actions, activation="linear"))
-    return model
+from stable_baselines3 import DQN
+from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
+from wumpus_env.envs import WumpusWorld
 
 # outuput visible?
-rend = 0
 
+rend = 1
 
 def main():
     # for saving timestamp and elapsed time
     now = datetime.datetime.now()
     start_time = time.time()
 
-    env = gym.make('wumpus-v0')
+    print("Main started")
 
-    states = np.arange(32)
-    actions = env.action_space
+    env = DummyVecEnv([lambda: WumpusWorld()])
 
-    model = build_model(states, actions)
-    model.summary()
+    print("Made environment")
+
+    model = DQN("MlpPolicy", env, verbose=1)
+    print("Made Model")
+    model.learn(total_timesteps=10000, log_interval=4)
+    print("Trained Model")
+    model.save("dqn_test")
+    print("Saved Model")
+
+    del model
+
+    model = DQN.load("dqn_test")
+    print("Loaded Model")
+
+    obs = env.reset()
+    print("Reset Env")
 
     # random environment
     episodes = 10
@@ -48,9 +52,9 @@ def main():
 
         while not done:
             if rend == 1: env.render()
-            action = random.choice(env.action_space)
+            action, _states = model.predict(obs, deterministic=True)
             if rend == 1: print(action)
-            n_state, reward, done, info = env.step(action)
+            obs, reward, done, info = env.step(action)
             score += reward
         if rend == 1: print('Episode:{} Score:{}'.format(episode, score))
 
