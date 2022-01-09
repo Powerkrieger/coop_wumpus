@@ -9,6 +9,8 @@ import os
 from wumpus_env.envs.utils.wumpus import Wumpus
 from wumpus_env.envs.utils.robot import Robot
 
+from collections import OrderedDict
+
 
 def create_new_playing_field():
     # change this to be able to randomize the playing field
@@ -84,9 +86,11 @@ class WumpusWorld(gym.Env):
         assert len(self.robots) > 0, 'Agent not found :('
 
         # self.action_space = spaces.Discrete(['MoveUp', 'MoveDown', 'MoveLeft', 'MoveRight', 'PickUp', 'PutDown',
-                                             # 'Climb', 'Scream', 'Nothing'])
+        # 'Climb', 'Scream', 'Nothing'])
         self.action_space = spaces.Discrete(9)
-        self.observation_space = spaces.Discrete(64)
+        self.observation_space = spaces.Dict({"stench": spaces.Discrete(2), "breeze": spaces.Discrete(2),
+                                              "glitter": spaces.Discrete(2), "bump": spaces.Discrete(2),
+                                              "scream": spaces.Discrete(2), "gold_h": spaces.Discrete(10)})
         self.robot_has_arrow = True
         self.robot_has_gold = False
         self.wumpus_awake = False
@@ -96,7 +100,13 @@ class WumpusWorld(gym.Env):
         observations = []
         for robot in self.robots:
             observations.append(self._get_current_state(robot, False, False))
-        return int(observations[0])
+        # [stench, breeze, glitter, bump, scream, gold_h]
+
+        obsdic = OrderedDict({"stench": observations[0][0], "breeze": observations[0][1],
+                              "glitter": observations[0][2], "bump": observations[0][3],
+                              "scream": observations[0][4], "gold_h": observations[0][5]})
+
+        return obsdic
 
     def exec_action(self, action_ind, robot):
         gameover = False
@@ -153,7 +163,7 @@ class WumpusWorld(gym.Env):
         elif action_ind == 6:
             # climb
             if robot.loc == self.exit_locs[robot.num] and self.robot_has_gold:
-                reward = 10*self.high_reward
+                reward = 10 * self.high_reward
                 gameover = True
             elif robot.loc == self.exit_locs[robot.num]:
                 reward = -self.high_reward
@@ -181,11 +191,10 @@ class WumpusWorld(gym.Env):
         rewards = []
         gameovers = []
 
-
         # set the agent on board! every agent??
         # new empty position
         for robot, action in zip(self.robots, [actions]):
-            assert action in self.action_space, 'Unknown action! : ' +  action
+            assert action in self.action_space, 'Unknown action! : ' + action
             # action_ind = self.action_space.index(action)
             action_ind = action
             old_robot_loc = copy.deepcopy(robot.loc)
@@ -268,22 +277,29 @@ class WumpusWorld(gym.Env):
         for loc in agent_fours:
             if loc is not None:
                 if 'P' in self.board[loc]:
-                    breeze.append(True)
-                elif 'W' in self.board[loc]:
-                    stench.append(True)
-                elif 'G' in self.board[loc]:
-                    glitter.append(True)
+                    breeze = True  # Hotfix, because List wasnt hepful -> breeze.append(True)
+                else:  # Reformated to if - else because values need to be set!
+                    breeze = False
+                if 'W' in self.board[loc]:
+                    stench = True  # Hotfix, because List wasnt hepful -> stench.append(True)
+                else:
+                    stench = False
+                if 'G' in self.board[loc]:
+                    glitter = True  # Hotfix, because List wasnt hepful -> glitter.append(True)
+                else:
+                    glitter = False
 
         gold_h = (abs(robot.loc[0] - self.gold_loc[0]) + abs(robot.loc[1] - self.gold_loc[1]))
 
         obs = [stench, breeze, glitter, bump, scream, gold_h]
 
-        confignum = 0
+        # Disabled to try Dict as obs space
+        '''confignum = 0
         for x in range(len(obs)):
             if obs[x]:
-                confignum = confignum + np.power(2, x)
+                confignum = confignum + np.power(2, x)'''
 
-        return confignum
+        return obs
 
     def get_action_space(self):
         return self.action_space
