@@ -46,9 +46,9 @@ def main():
     
     print("Made environment")
 
-    model = DQN("MlpPolicy", env, verbose=1)
+    model = DQN("MultiInputPolicy", env, verbose=1)  # Changed to MultiInputPolicy for Dict obs space compatibility
     print("Made Model")
-    model.learn(total_timesteps=10000, log_interval=4)
+    model.learn(total_timesteps=50000, log_interval=4)
     print("Trained Model")
     model.save("dqn_test")
     print("Saved Model")
@@ -67,9 +67,6 @@ def main():
         state = env.reset()
         done = False
         score = 0
-
-        observations = env.observation_space
-        print(observations)
 
         a = ['MoveUp', 'MoveDown', 'MoveLeft', 'MoveRight', 'PickUp', 'PutDown', 'Climb', 'Scream', 'Nothing']
         while not done:

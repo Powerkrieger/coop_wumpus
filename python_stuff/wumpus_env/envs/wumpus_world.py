@@ -256,7 +256,11 @@ class WumpusWorld(gym.Env):
         done = True if sum(1 for x in gameovers if x) == self.num_robots else False
 
         # return state, reward, done, info
-        return int(observations[0]), rewards[0], done, {}
+        stepdict = OrderedDict({"stench": state[0], "breeze": state[1],
+                                "glitter": state[2], "bump": state[3],
+                                "scream": state[4], "gold_h": state[5]})
+
+        return stepdict, rewards[0], done, {}
 
     def _get_current_state(self, robot, scream, bump):
         # robot.location and current position things!
