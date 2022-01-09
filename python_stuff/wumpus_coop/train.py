@@ -9,9 +9,13 @@ import os
 
 import random
 import time
+
+import stable_baselines3
+
 import wumpus_env
 from datetime import timedelta
 
+from stable_baselines3.common import env_checker
 from stable_baselines3 import DQN
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 from wumpus_env.envs import WumpusWorld
@@ -38,6 +42,7 @@ def main():
 
     env = gym.make("wumpus-v0")
     env.configure(args.env_config)
+    stable_baselines3.common.env_checker.check_env(env, warn=True, skip_render_check=True)
     
     print("Made environment")
 

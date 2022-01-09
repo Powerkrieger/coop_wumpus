@@ -96,7 +96,7 @@ class WumpusWorld(gym.Env):
         observations = []
         for robot in self.robots:
             observations.append(self._get_current_state(robot, False, False))
-        return observations[0]
+        return int(observations[0])
 
     def exec_action(self, action_ind, robot):
         gameover = False
@@ -139,7 +139,9 @@ class WumpusWorld(gym.Env):
             if self.board[robot.loc] == 'A&G':
                 self.board[robot.loc] = 'A'
                 self.robot_has_gold = True
-            reward = -self.base_reward
+                reward = self.high_reward / 5
+            else:
+                reward = -self.base_reward
 
         elif action_ind == 5:
             # put down
@@ -245,7 +247,7 @@ class WumpusWorld(gym.Env):
         done = True if sum(1 for x in gameovers if x) == self.num_robots else False
 
         # return state, reward, done, info
-        return observations[0], rewards[0], done, {}
+        return int(observations[0]), rewards[0], done, {}
 
     def _get_current_state(self, robot, scream, bump):
         # robot.location and current position things!
@@ -272,8 +274,7 @@ class WumpusWorld(gym.Env):
                 elif 'G' in self.board[loc]:
                     glitter.append(True)
 
-        gold_h = (abs(robot.loc[0] - self.gold_loc[0]), abs(robot.loc[1] - self.gold_loc[1]))
-        print(gold_h)
+        gold_h = (abs(robot.loc[0] - self.gold_loc[0]) + abs(robot.loc[1] - self.gold_loc[1]))
 
         obs = [stench, breeze, glitter, bump, scream, gold_h]
 
