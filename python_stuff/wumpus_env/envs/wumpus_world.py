@@ -78,7 +78,7 @@ class WumpusWorld(gym.Env):
                 if self.board[row, col] == 'A':
                     self.robots.append(Robot(env_config, row, col, self.num_robots))
                     self.num_robots += 1
-                    self.exit_locs.append((col, row))
+                    self.exit_locs.append((row, col))  # switched col, row to row, col
                 elif self.board[row, col] == 'W':
                     self.wumpus = Wumpus(env_config, row, col)
                 elif self.board[row, col] == 'G':
@@ -256,8 +256,7 @@ class WumpusWorld(gym.Env):
                 reward = -self.high_reward
                 gameover = True
             elif old_robot_loc == robot.loc:
-                bump = True
-                reward = -self.base_reward
+                bump = True  # Removed -baseReward here because its not necessary and causing errors with climb
 
             state = self._get_current_state(robot, scream, bump)
             observations.append(state)
