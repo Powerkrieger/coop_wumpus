@@ -74,6 +74,7 @@ def main():
             action, _states = model.predict(obs, deterministic=True)
             if rend == 1: print(a[action])
             obs, rewards, done, info = env.step(action)
+            print(obs)
             score += rewards
         if rend == 1: print('Episode:{} Score:{}'.format(episode, score))
 

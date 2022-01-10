@@ -112,13 +112,17 @@ class WumpusWorld(gym.Env):
         gameover = False
         scream = False
 
+        gold_h_start = (abs(robot.loc[0] - self.gold_loc[0]) + abs(robot.loc[1] - self.gold_loc[1]))
+
         if action_ind == 0:
             # north
             if robot.loc[0] > 0:
                 self.board[robot.loc] = '.' if self.board[robot.loc] == 'A' else self.board[robot.loc].replace('A&',
                                                                                                                '')
                 robot.loc = (robot.loc[0] - 1, robot.loc[1])
-            reward = -self.base_reward
+            # Maybe better reward calculation to emphazize hassling in the dircetion of the gold
+            gold_h_end = (abs(robot.loc[0] - self.gold_loc[0]) + abs(robot.loc[1] - self.gold_loc[1]))
+            reward = -self.base_reward + (self.base_reward * (gold_h_start - gold_h_end))
 
         elif action_ind == 1:
             # south
@@ -126,7 +130,9 @@ class WumpusWorld(gym.Env):
                 self.board[robot.loc] = '.' if self.board[robot.loc] == 'A' else self.board[robot.loc].replace('A&',
                                                                                                                '')
                 robot.loc = (robot.loc[0] + 1, robot.loc[1])
-            reward = -self.base_reward
+            # Maybe better reward calculation to emphazize hassling in the dircetion of the gold
+            gold_h_end = (abs(robot.loc[0] - self.gold_loc[0]) + abs(robot.loc[1] - self.gold_loc[1]))
+            reward = -self.base_reward + (self.base_reward * (gold_h_start - gold_h_end))
 
         elif action_ind == 2:
             # west
@@ -134,7 +140,9 @@ class WumpusWorld(gym.Env):
                 self.board[robot.loc] = '.' if self.board[robot.loc] == 'A' else self.board[robot.loc].replace('A&',
                                                                                                                '')
                 robot.loc = (robot.loc[0], robot.loc[1] - 1)
-            reward = -self.base_reward
+            # Maybe better reward calculation to emphazize hassling in the dircetion of the gold
+            gold_h_end = (abs(robot.loc[0] - self.gold_loc[0]) + abs(robot.loc[1] - self.gold_loc[1]))
+            reward = -self.base_reward + (self.base_reward * (gold_h_start - gold_h_end))
 
         elif action_ind == 3:
             # east
@@ -142,13 +150,16 @@ class WumpusWorld(gym.Env):
                 self.board[robot.loc] = '.' if self.board[robot.loc] == 'A' else self.board[robot.loc].replace('A&',
                                                                                                                '')
                 robot.loc = (robot.loc[0], robot.loc[1] + 1)
-            reward = -self.base_reward
+            # Maybe better reward calculation to emphazize hassling in the dircetion of the gold
+            gold_h_end = (abs(robot.loc[0] - self.gold_loc[0]) + abs(robot.loc[1] - self.gold_loc[1]))
+            reward = -self.base_reward + (self.base_reward * (gold_h_start - gold_h_end))
 
         elif action_ind == 4:
             # pick up
             if self.board[robot.loc] == 'A&G':
                 self.board[robot.loc] = 'A'
                 self.robot_has_gold = True
+                # Maybe better reward calculation to emphazize picking the senf auch up
                 reward = self.high_reward / 5
             else:
                 reward = -self.base_reward
