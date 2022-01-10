@@ -46,9 +46,9 @@ def main():
     
     print("Made environment")
 
-    model = DQN("MultiInputPolicy", env, verbose=1)  # Changed to MultiInputPolicy for Dict obs space compatibility
+    model = DQN("MultiInputPolicy", env, verbose=0)  # Changed to MultiInputPolicy for Dict obs space compatibility
     print("Made Model")
-    model.learn(total_timesteps=50000, log_interval=4)
+    model.learn(total_timesteps=500000, log_interval=100)
     print("Trained Model")
     model.save("dqn_test")
     print("Saved Model")
