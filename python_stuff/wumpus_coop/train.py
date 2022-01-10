@@ -20,11 +20,12 @@ from stable_baselines3 import DQN
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 from wumpus_env.envs import WumpusWorld
 
-# outuput visible?
+# Outuput visible?
 rend = 1
 
-# Mode (0 -> Make new model; 1 -> Use existing model)?
+# Mode? (0 -> Make new model; 1 -> Use existing model; steps -> Number of training steps to take)
 m_mode = 1
+steps = 500000
 
 def main():
     # for saving timestamp and elapsed time
@@ -52,7 +53,6 @@ def main():
         print("[ModelMaker]: Rebuilding Model from scratch")
         model = DQN("MultiInputPolicy", env, verbose=1)  # Changed to MultiInputPolicy for Dict obs space compatibility
         print("[ModelMaker]: Made Model")
-        steps = 500000
         print("[ModelMaker]: Training model in", steps, "steps.")
         model.learn(total_timesteps=steps, log_interval=100)
         print("[ModelMaker]: Training completed.")
