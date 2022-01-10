@@ -275,9 +275,13 @@ class WumpusWorld(gym.Env):
     def _get_current_state(self, robot, scream, bump):
         # robot.location and current position things!
         # [stench, breeze, glitter, bump, scream]
-        stench = [False] * self.num_robots
-        breeze = [False] * self.num_robots
-        glitter = [False] * self.num_robots
+        # stench = [False] * self.num_robots -> Hotfix because one Bot WIP
+        # breeze = [False] * self.num_robots -> Hotfix because one Bot WIP
+        # glitter = [False] * self.num_robots -> Hotfix because one Bot WIP
+
+        stench = False
+        breeze = False
+        glitter = False
 
         agent_fours = [
             # ob and location, ob for moving the wumpus therefor pointing in opposite direction
@@ -292,16 +296,10 @@ class WumpusWorld(gym.Env):
             if loc is not None:
                 if 'P' in self.board[loc]:
                     breeze = True  # Hotfix, because List wasnt hepful -> breeze.append(True)
-                else:  # Reformated to if - else because values need to be set!
-                    breeze = False
                 if 'W' in self.board[loc]:
                     stench = True  # Hotfix, because List wasnt hepful -> stench.append(True)
-                else:
-                    stench = False
                 if 'G' in self.board[loc]:
                     glitter = True  # Hotfix, because List wasnt hepful -> glitter.append(True)
-                else:
-                    glitter = False
 
         gold_h = (abs(robot.loc[0] - self.gold_loc[0]) + abs(robot.loc[1] - self.gold_loc[1]))
 
