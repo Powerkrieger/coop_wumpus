@@ -177,7 +177,7 @@ class WumpusWorld(gym.Env):
         elif action_ind == 6:
             # climb
             if robot.loc == self.exit_locs[robot.num] and self.robot_has_gold:
-                reward = 10000 * self.high_reward
+                reward = 10 * self.high_reward
                 gameover = True
             elif robot.loc == self.exit_locs[robot.num]:
                 reward = -self.high_reward
