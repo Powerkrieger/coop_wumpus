@@ -57,6 +57,7 @@ class WumpusWorld(gym.Env):
 
         self.gold_loc = None
         self.robot_had_gold = None
+        self.robot_was_exit = None
 
     def configure(self, config):
         self.robots = []
@@ -71,6 +72,7 @@ class WumpusWorld(gym.Env):
         env_config.read(config)
 
         self.robot_had_gold = False
+        self.robot_was_exit = False
 
         # self.final_num_robots = env_config.getint('env', 'num_robots')
         self.wumpus = None
@@ -131,10 +133,19 @@ class WumpusWorld(gym.Env):
             if self.robot_has_gold:
                 exit_h_end = (abs(robot.loc[0] - self.exit_locs[robot.num][0]) +
                               abs(robot.loc[1] - self.exit_locs[robot.num][1]))
-                reward = -self.base_reward + (2 * self.base_reward * (exit_h_start - exit_h_end))
+                if exit_h_end == 0 and not self.robot_was_exit:
+                    reward = self.high_reward / 10
+                    self.robot_was_exit = True
+                elif not self.robot_was_exit:
+                    # reward = -self.base_reward + (2 * self.base_reward * (exit_h_start - exit_h_end))
+                    reward = -1 - self.base_reward * exit_h_end + (2 * self.base_reward * (exit_h_start - exit_h_end))
+                else:
+                    # reward = -self.base_reward + (4 * self.base_reward * (exit_h_start - exit_h_end))
+                    reward = -1 - self.base_reward * exit_h_end + (4 * self.base_reward * (exit_h_start - exit_h_end))
             else:
                 gold_h_end = (abs(robot.loc[0] - self.gold_loc[0]) + abs(robot.loc[1] - self.gold_loc[1]))
-                reward = -self.base_reward + (2 * self.base_reward * (gold_h_start - gold_h_end))
+                # reward = -self.base_reward + (2 * self.base_reward * (gold_h_start - gold_h_end))
+                reward = -1 - self.base_reward * gold_h_end + (2 * self.base_reward * (gold_h_start - gold_h_end))
 
         elif action_ind == 1:
             # south
@@ -146,10 +157,19 @@ class WumpusWorld(gym.Env):
             if self.robot_has_gold:
                 exit_h_end = (abs(robot.loc[0] - self.exit_locs[robot.num][0]) +
                               abs(robot.loc[1] - self.exit_locs[robot.num][1]))
-                reward = -self.base_reward + (2 * self.base_reward * (exit_h_start - exit_h_end))
+                if exit_h_end == 0 and not self.robot_was_exit:
+                    reward = self.high_reward / 10
+                    self.robot_was_exit = True
+                elif not self.robot_was_exit:
+                    # reward = -self.base_reward + (2 * self.base_reward * (exit_h_start - exit_h_end))
+                    reward = -1 - self.base_reward * exit_h_end + (2 * self.base_reward * (exit_h_start - exit_h_end))
+                else:
+                    # reward = -self.base_reward + (4 * self.base_reward * (exit_h_start - exit_h_end))
+                    reward = -1 - self.base_reward * exit_h_end + (4 * self.base_reward * (exit_h_start - exit_h_end))
             else:
                 gold_h_end = (abs(robot.loc[0] - self.gold_loc[0]) + abs(robot.loc[1] - self.gold_loc[1]))
-                reward = -self.base_reward + (2 * self.base_reward * (gold_h_start - gold_h_end))
+                # reward = -self.base_reward + (2 * self.base_reward * (gold_h_start - gold_h_end))
+                reward = -1 - self.base_reward * gold_h_end + (2 * self.base_reward * (gold_h_start - gold_h_end))
 
         elif action_ind == 2:
             # west
@@ -161,10 +181,19 @@ class WumpusWorld(gym.Env):
             if self.robot_has_gold:
                 exit_h_end = (abs(robot.loc[0] - self.exit_locs[robot.num][0]) +
                               abs(robot.loc[1] - self.exit_locs[robot.num][1]))
-                reward = -self.base_reward + (2 * self.base_reward * (exit_h_start - exit_h_end))
+                if exit_h_end == 0 and not self.robot_was_exit:
+                    reward = self.high_reward / 10
+                    self.robot_was_exit = True
+                elif not self.robot_was_exit:
+                    # reward = -self.base_reward + (2 * self.base_reward * (exit_h_start - exit_h_end))
+                    reward = -1 - self.base_reward * exit_h_end + (2 * self.base_reward * (exit_h_start - exit_h_end))
+                else:
+                    # reward = -self.base_reward + (4 * self.base_reward * (exit_h_start - exit_h_end))
+                    reward = -1 - self.base_reward * exit_h_end + (4 * self.base_reward * (exit_h_start - exit_h_end))
             else:
                 gold_h_end = (abs(robot.loc[0] - self.gold_loc[0]) + abs(robot.loc[1] - self.gold_loc[1]))
-                reward = -self.base_reward + (2 * self.base_reward * (gold_h_start - gold_h_end))
+                # reward = -self.base_reward + (2 * self.base_reward * (gold_h_start - gold_h_end))
+                reward = -1 - self.base_reward * gold_h_end + (2 * self.base_reward * (gold_h_start - gold_h_end))
 
         elif action_ind == 3:
             # east
@@ -176,10 +205,19 @@ class WumpusWorld(gym.Env):
             if self.robot_has_gold:
                 exit_h_end = (abs(robot.loc[0] - self.exit_locs[robot.num][0]) +
                               abs(robot.loc[1] - self.exit_locs[robot.num][1]))
-                reward = -self.base_reward + (2 * self.base_reward * (exit_h_start - exit_h_end))
+                if exit_h_end == 0 and not self.robot_was_exit:
+                    reward = self.high_reward / 10
+                    self.robot_was_exit = True
+                elif not self.robot_was_exit:
+                    # reward = -self.base_reward + (2 * self.base_reward * (exit_h_start - exit_h_end))
+                    reward = -1 - self.base_reward * exit_h_end + (2 * self.base_reward * (exit_h_start - exit_h_end))
+                else:
+                    # reward = -self.base_reward + (4 * self.base_reward * (exit_h_start - exit_h_end))
+                    reward = -1 - self.base_reward * exit_h_end + (4 * self.base_reward * (exit_h_start - exit_h_end))
             else:
                 gold_h_end = (abs(robot.loc[0] - self.gold_loc[0]) + abs(robot.loc[1] - self.gold_loc[1]))
-                reward = -self.base_reward + (2 * self.base_reward * (gold_h_start - gold_h_end))
+                # reward = -self.base_reward + (2 * self.base_reward * (gold_h_start - gold_h_end))
+                reward = -1 - self.base_reward * gold_h_end + (2 * self.base_reward * (gold_h_start - gold_h_end))
 
         elif action_ind == 4:
             # pick up
@@ -192,14 +230,16 @@ class WumpusWorld(gym.Env):
                     reward = self.high_reward / 5
                     self.robot_had_gold = True
             else:
-                reward = -self.base_reward
+                reward = -self.base_reward * 10
 
         elif action_ind == 5:
             # put down
             if self.robot_has_gold and self.board[robot.loc] == 'A':
                 self.board[robot.loc] = 'A&G'
                 self.robot_has_gold = False
-            reward = -self.base_reward
+                reward = -self.base_reward
+            else:
+                reward = 10 * -self.base_reward
 
         elif action_ind == 6:
             # climb
@@ -210,16 +250,16 @@ class WumpusWorld(gym.Env):
                 reward = -self.high_reward
                 gameover = True
             else:
-                reward = -self.base_reward
+                reward = -self.base_reward * (exit_h_start * 5)
                 bump = True
 
         elif action_ind == 7:
             # scream
             scream = True
-            reward = -self.base_reward
+            reward = 9 * -self.base_reward
         elif action_ind == 8:
             # Nothing
-            reward = -self.base_reward
+            reward = 10 * -self.base_reward
 
         return reward, scream, gameover
 

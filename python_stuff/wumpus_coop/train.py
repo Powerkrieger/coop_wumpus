@@ -26,7 +26,7 @@ rend = 1
 
 # Mode? (0 -> Make new model; 1 -> Use existing model; steps -> Number of training steps to take)
 m_mode = 1
-steps = 1000000
+steps = 200000
 
 def main():
     # for saving timestamp and elapsed time
@@ -52,7 +52,7 @@ def main():
 
     if m_mode == 0:
         print("[ModelMaker]: Rebuilding Model from scratch")
-        model = DQN("MultiInputPolicy", env, learning_starts=int(steps*0.6), verbose=1)
+        model = DQN("MultiInputPolicy", env, learning_starts=int(steps*0.5), verbose=1)
         # Changed to MultiInputPolicy for Dict obs space compatibility
         print("[ModelMaker]: Made Model")
         print("[ModelMaker]: Training model in", steps, "steps.")
@@ -81,7 +81,11 @@ def main():
             done = False
             score = 0
 
-            while not done:
+            step_count = 0
+            max_steps = 50
+
+            while not done and step_count <= max_steps:
+                step_count += 1
                 if rend == 1: env.render()
                 action, _states = model.predict(obs, deterministic=True)
                 if rend == 1: print(a[action])
